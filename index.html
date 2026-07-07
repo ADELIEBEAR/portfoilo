@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>계좌진단서 — 보유종목 캡처로 받는 AI 포트폴리오 검진</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F3F6F4;
+    --card:#FFFFFF;
+    --ink:#17221F;
+    --ink-soft:#5A6763;
+    --line:#D8E0DC;
+    --teal:#0E7D63;
+    --teal-deep:#0A5A48;
+    --risk:#C6431F;
+    --warn:#B7860B;
+    --up:#D13B3B;
+    --down:#2C63C8;
+    --stamp:#C6431F;
+    --radius:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Pretendard Variable',Pretendard,-apple-system,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .serif{font-family:'Gowun Batang',serif}
+  .mono{font-family:'IBM Plex Mono',monospace}
+
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px}
+
+  header{
+    padding:18px 0;border-bottom:1px solid var(--line);
+    background:rgba(243,246,244,.85);backdrop-filter:blur(8px);
+    position:sticky;top:0;z-index:10;
+  }
+  header .wrap{display:flex;align-items:center;justify-content:space-between}
+  .logo{font-family:'Gowun Batang',serif;font-weight:700;font-size:18px;letter-spacing:-.02em}
+  .logo em{font-style:normal;color:var(--teal)}
+  .hdr-note{font-size:12px;color:var(--ink-soft)}
+
+  .hero{padding:64px 0 48px;text-align:center}
+  .hero .eyebrow{
+    display:inline-block;font-size:12px;letter-spacing:.14em;color:var(--teal-deep);
+    border:1px solid var(--teal);border-radius:999px;padding:5px 14px;margin-bottom:22px;
+    background:#fff;
+  }
+  .hero h1{
+    font-family:'Gowun Batang',serif;font-weight:700;
+    font-size:clamp(28px,5vw,44px);line-height:1.35;letter-spacing:-.02em;
+  }
+  .hero h1 .u{background:linear-gradient(transparent 62%, rgba(14,125,99,.22) 62%)}
+  .hero p.sub{margin:18px auto 0;max-width:540px;color:var(--ink-soft);font-size:16px}
+  .hero .steps{
+    display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:28px;
+    font-size:13px;color:var(--ink-soft);
+  }
+  .hero .steps span{background:#fff;border:1px solid var(--line);border-radius:8px;padding:7px 12px}
+  .hero .steps b{color:var(--teal-deep)}
+  .apps{margin-top:16px;font-size:12px;color:var(--ink-soft)}
+  .apps b{color:var(--ink);font-weight:600}
+
+  .uploader{
+    margin:36px auto 0;max-width:560px;background:var(--card);
+    border:1.5px dashed #9DB4AC;border-radius:var(--radius);
+    padding:36px 24px;cursor:pointer;transition:all .2s;position:relative;
+  }
+  .uploader:hover,.uploader.drag{border-color:var(--teal);background:#F5FBF9;transform:translateY(-2px)}
+  .uploader .icon{font-size:34px}
+  .uploader h3{font-size:17px;margin-top:10px;font-weight:700}
+  .uploader p{font-size:13px;color:var(--ink-soft);margin-top:6px}
+  .uploader input{display:none}
+  .privacy{font-size:12px;color:var(--ink-soft);margin-top:14px}
+  .privacy b{color:var(--teal-deep)}
+  .tip{
+    max-width:560px;margin:14px auto 0;background:#fff;border:1px solid var(--line);
+    border-radius:10px;padding:12px 16px;font-size:12.5px;color:var(--ink-soft);text-align:left;
+  }
+  .tip b{color:var(--ink)}
+
+  .preview{max-width:560px;margin:20px auto 0;display:none}
+  .thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+  .thumb{position:relative}
+  .thumb img{
+    width:100%;aspect-ratio:9/14;object-fit:cover;object-position:top;
+    border-radius:10px;border:1px solid var(--line);
+    box-shadow:0 6px 18px rgba(23,34,31,.08);
+  }
+  .thumb button{
+    position:absolute;top:6px;right:6px;width:24px;height:24px;border:none;border-radius:50%;
+    background:rgba(23,34,31,.75);color:#fff;cursor:pointer;font-size:13px;line-height:1;
+  }
+  .add-more{
+    border:1.5px dashed #9DB4AC;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    color:var(--ink-soft);font-size:13px;cursor:pointer;aspect-ratio:9/14;background:#fff;
+  }
+  .add-more:hover{border-color:var(--teal);color:var(--teal-deep)}
+
+  .btn{
+    display:inline-block;border:none;cursor:pointer;font-family:inherit;
+    background:var(--teal);color:#fff;font-size:16px;font-weight:700;
+    padding:15px 34px;border-radius:10px;margin-top:18px;transition:all .2s;
+    box-shadow:0 4px 14px rgba(14,125,99,.28);
+  }
+  .btn:hover{background:var(--teal-deep);transform:translateY(-1px)}
+  .btn:disabled{opacity:.5;cursor:wait;transform:none}
+  .btn.ghost{background:#fff;color:var(--ink);box-shadow:none;border:1px solid var(--line);font-weight:500;font-size:14px;padding:12px 22px;margin-left:8px}
+
+  .loading{display:none;text-align:center;padding:48px 0}
+  .pulse{
+    width:52px;height:52px;margin:0 auto 18px;border-radius:50%;
+    border:3px solid var(--line);border-top-color:var(--teal);
+    animation:spin 1s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading p{color:var(--ink-soft);font-size:14px}
+  .loading .step-txt{font-weight:600;color:var(--ink);font-size:15px;margin-bottom:6px}
+
+  .report{display:none;margin:48px auto 0;max-width:760px}
+  .doc{
+    background:var(--card);border:1px solid var(--line);border-radius:4px;
+    padding:44px 40px;position:relative;
+    box-shadow:0 14px 40px rgba(23,34,31,.10);
+  }
+  .doc::before{
+    content:"";position:absolute;left:0;top:0;right:0;height:6px;
+    background:repeating-linear-gradient(90deg,var(--teal) 0 14px,transparent 14px 22px);
+    opacity:.75;
+  }
+  .doc-head{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    border-bottom:2px solid var(--ink);padding-bottom:18px;
+  }
+  .doc-head h2{font-family:'Gowun Batang',serif;font-size:26px;letter-spacing:.35em;font-weight:700}
+  .doc-head .meta{font-size:12px;color:var(--ink-soft);text-align:right;line-height:1.7}
+  .app-tag{
+    display:none;margin-top:16px;font-size:12px;color:var(--teal-deep);
+    background:#E2F3ED;border-radius:6px;padding:4px 10px;width:fit-content;
+  }
+
+  .stamp{
+    position:absolute;top:34px;right:36px;width:86px;height:86px;
+    border:3px solid var(--stamp);border-radius:50%;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    color:var(--stamp);transform:rotate(-11deg);opacity:0;
+    font-family:'Gowun Batang',serif;font-weight:700;
+    transition:all .5s cubic-bezier(.2,1.6,.4,1);
+  }
+  .stamp.show{opacity:.92;transform:rotate(-11deg) scale(1)}
+  .stamp .g{font-size:34px;line-height:1}
+  .stamp .t{font-size:10px;letter-spacing:.2em;margin-top:2px}
+
+  .score-row{display:flex;gap:28px;align-items:center;padding:26px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .gauge{position:relative;width:132px;height:132px;flex:none}
+  .gauge svg{transform:rotate(-90deg)}
+  .gauge .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .gauge .num b{font-size:34px;font-family:'IBM Plex Mono',monospace;font-weight:600}
+  .gauge .num span{font-size:11px;color:var(--ink-soft)}
+  .summary{flex:1;min-width:220px}
+  .summary h3{font-size:15px;color:var(--teal-deep);margin-bottom:8px;letter-spacing:.06em}
+  .summary p{font-size:15px}
+
+  .sec{padding:26px 0;border-bottom:1px solid var(--line)}
+  .sec:last-of-type{border-bottom:none}
+  .sec h3{
+    font-family:'Gowun Batang',serif;font-size:17px;font-weight:700;margin-bottom:16px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .sec h3::before{content:"";width:8px;height:8px;background:var(--teal);flex:none}
+
+  .holdings{display:flex;flex-direction:column;gap:8px}
+  .hrow{display:flex;align-items:center;gap:12px;font-size:14px}
+  .hrow .nm{width:140px;flex:none;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hrow .bar{flex:1;height:16px;background:#EDF2F0;border-radius:3px;overflow:hidden}
+  .hrow .bar i{display:block;height:100%;background:var(--teal);opacity:.85;border-radius:3px;transition:width .8s ease}
+  .hrow .pc{width:48px;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:13px}
+  .hrow .rt{width:64px;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:12px;flex:none}
+  .rt.up{color:var(--up)} .rt.down{color:var(--down)} .rt.flat{color:var(--ink-soft)}
+
+  .diag-item{display:flex;gap:12px;padding:12px 0;border-top:1px dashed var(--line)}
+  .diag-item:first-of-type{border-top:none}
+  .badge{
+    flex:none;font-size:11px;font-weight:700;border-radius:5px;padding:3px 9px;height:fit-content;margin-top:2px;
+    letter-spacing:.05em;
+  }
+  .badge.good{background:#E2F3ED;color:var(--teal-deep)}
+  .badge.warn{background:#F8EFD8;color:var(--warn)}
+  .badge.risk{background:#F9E3DB;color:var(--risk)}
+  .diag-item h4{font-size:14.5px;font-weight:700}
+  .diag-item p{font-size:13.5px;color:var(--ink-soft);margin-top:3px}
+
+  .scn{display:grid;grid-template-columns:1fr;gap:12px}
+  .scn-card{border:1px solid var(--line);border-radius:10px;padding:16px}
+  .scn-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+  .scn-card h4{font-size:14px;font-weight:700}
+  .scn-card .res{font-size:12px;font-weight:700}
+  .scn-card .res.강함{color:var(--teal-deep)} .scn-card .res.보통{color:var(--warn)} .scn-card .res.취약{color:var(--risk)}
+  .scn-card p.cmt{font-size:13px;color:var(--ink-soft);margin-top:6px}
+  .scn-rsp{border-top:1px dashed var(--line);margin-top:10px;padding-top:10px}
+  .rsp-tag{
+    font-size:11px;font-weight:700;color:#185FA5;background:#E6F1FB;
+    border-radius:4px;padding:2px 7px;
+  }
+  .scn-rsp p{font-size:13px;margin-top:7px;line-height:1.6}
+
+  .actions li{
+    list-style:none;font-size:14.5px;padding:10px 0 10px 30px;position:relative;
+    border-top:1px dashed var(--line);
+  }
+  .actions li:first-child{border-top:none}
+  .actions li::before{content:"✓";position:absolute;left:2px;color:var(--teal);font-weight:700}
+
+  /* 개선 처방 */
+  .rx-note{font-size:12.5px;color:var(--ink-soft);margin:-8px 0 16px}
+  .rx-label{font-size:12px;color:var(--ink-soft);margin-bottom:6px}
+  .rx-concept{color:var(--teal-deep);font-weight:600}
+  .mixbar{display:flex;height:30px;border-radius:6px;overflow:hidden;margin-bottom:14px}
+  .mixbar div{
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;white-space:nowrap;overflow:hidden;transition:width .8s ease;
+  }
+  .rx-rationale{font-size:13px;color:var(--ink-soft);margin-top:-4px}
+  .rx-step{display:flex;gap:10px;padding:10px 0;border-top:1px dashed var(--line)}
+  .rx-step:first-of-type{border-top:none}
+  .rx-step .period{
+    flex:none;font-size:11px;font-weight:700;border-radius:5px;padding:2px 8px;
+    height:fit-content;margin-top:2px;background:#E6F1FB;color:#185FA5;
+    min-width:56px;text-align:center;
+  }
+  .rx-step p{font-size:13.5px;margin:0}
+
+  .disclaimer{
+    margin-top:22px;font-size:11.5px;color:var(--ink-soft);line-height:1.7;
+    background:#EEF3F1;border-radius:8px;padding:14px 16px;
+  }
+  .again{text-align:center;margin-top:26px}
+
+  .err{
+    display:none;max-width:560px;margin:22px auto 0;background:#F9E3DB;color:var(--risk);
+    border-radius:10px;padding:16px 18px;font-size:14px;text-align:left;
+  }
+
+  footer{padding:44px 0 60px;text-align:center;color:var(--ink-soft);font-size:12px}
+
+  @media (max-width:600px){
+    .doc{padding:32px 20px}
+    .doc-head h2{font-size:20px;letter-spacing:.2em}
+    .stamp{width:68px;height:68px;top:26px;right:18px}
+    .stamp .g{font-size:26px}
+    .hrow .nm{width:88px}
+    .hrow .rt{width:56px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="logo">계좌<em>진단서</em></div>
+    <div class="hdr-note">AI 포트폴리오 정기검진</div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero" id="heroSec">
+    <span class="eyebrow">AI PORTFOLIO CHECK-UP</span>
+    <h1>보유종목 화면 캡처 <span class="u">한 장</span>이면,<br>AI가 내 포트폴리오를 진단합니다</h1>
+    <p class="sub">증권사 앱의 <b>잔고(보유종목) 화면</b>을 캡처해서 올려주세요.<br>구성 · 집중도 리스크 · 미래 시나리오 대응력까지 30초 만에.</p>
+    <div class="steps">
+      <span><b>1</b>&nbsp; 잔고 화면 캡처</span>
+      <span><b>2</b>&nbsp; 이미지 업로드 (여러 장 가능)</span>
+      <span><b>3</b>&nbsp; 진단서 발급</span>
+    </div>
+    <p class="apps"><b>모든 증권사 앱 지원</b> · 토스증권 · 키움 영웅문 · 삼성 mPOP · 미래에셋 · NH · KB · 한투 · 업비트 등</p>
+
+    <div class="uploader" id="dropZone" role="button" tabindex="0" aria-label="보유종목 화면 캡처 업로드">
+      <div class="icon">📷</div>
+      <h3>보유종목 화면 캡처를 올려주세요</h3>
+      <p>클릭하거나 끌어다 놓기 · 종목이 많으면 스크롤하며 여러 장(최대 4장)</p>
+      <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp,image/gif" multiple>
+    </div>
+    <p class="privacy">🔒 이미지는 진단에만 사용됩니다. <b>계좌번호·이름·총자산은 가리고 캡처해도 진단됩니다.</b></p>
+    <div class="tip">
+      <b>💡 정확한 진단을 위한 캡처 팁</b> — 매매(거래)내역 화면이 아니라 <b>보유종목/잔고 화면</b>을 캡처해 주세요.
+      종목명과 평가금액(또는 비중)이 보이면 충분하고, 수익률까지 보이면 더 정밀하게 진단합니다.
+    </div>
+
+    <div class="preview" id="preview">
+      <div class="thumbs" id="thumbs"></div>
+      <div>
+        <button class="btn" id="analyzeBtn">진단 시작하기</button>
+        <button class="btn ghost" id="resetBtn1">처음부터</button>
+      </div>
+    </div>
+
+    <div class="err" id="errBox"></div>
+  </section>
+
+  <section class="loading" id="loading">
+    <div class="pulse" aria-hidden="true"></div>
+    <p class="step-txt" id="loadTxt">캡처에서 보유 종목을 읽는 중…</p>
+    <p>보통 10~20초 정도 걸립니다</p>
+  </section>
+
+  <section class="report" id="report">
+    <div class="doc">
+      <div class="stamp" id="stamp"><span class="g" id="stampGrade">B</span><span class="t">진단완료</span></div>
+      <div class="doc-head">
+        <h2>계좌진단서</h2>
+        <div class="meta">
+          발급일 <span id="repDate"></span><br>
+          진단기관 · 계좌진단서 AI LAB
+        </div>
+      </div>
+      <div class="app-tag" id="appTag"></div>
+
+      <div class="score-row">
+        <div class="gauge">
+          <svg width="132" height="132" viewBox="0 0 132 132">
+            <circle cx="66" cy="66" r="56" fill="none" stroke="#EDF2F0" stroke-width="12"/>
+            <circle id="gaugeArc" cx="66" cy="66" r="56" fill="none" stroke="var(--teal)" stroke-width="12"
+              stroke-linecap="round" stroke-dasharray="351.8" stroke-dashoffset="351.8"
+              style="transition:stroke-dashoffset 1s ease"/>
+          </svg>
+          <div class="num"><b id="scoreNum">0</b><span>종합점수</span></div>
+        </div>
+        <div class="summary">
+          <h3>종합 소견</h3>
+          <p id="summaryTxt"></p>
+        </div>
+      </div>
+
+      <div class="sec">
+        <h3>보유 구성 판독</h3>
+        <div class="holdings" id="holdings"></div>
+      </div>
+
+      <div class="sec">
+        <h3>항목별 진단</h3>
+        <div id="diagList"></div>
+      </div>
+
+      <div class="sec">
+        <h3>미래 시나리오 대응력 점검</h3>
+        <div class="scn" id="scnList"></div>
+      </div>
+
+      <div class="sec">
+        <h3>점검 포인트</h3>
+        <ul class="actions" id="actionList"></ul>
+      </div>
+
+      <div class="sec" id="rxSec" style="display:none">
+        <h3>개선 처방</h3>
+        <p class="rx-note">일반적인 분산투자 원칙에 따른 참고 구조입니다. 특정 종목 추천이 아닙니다.</p>
+        <div class="rx-label">현재 배분</div>
+        <div class="mixbar" id="mixCurrent"></div>
+        <div class="rx-label">참고 배분 <span class="rx-concept" id="rxConcept"></span></div>
+        <div class="mixbar" id="mixTarget"></div>
+        <p class="rx-rationale" id="rxRationale"></p>
+        <div class="rx-label" style="margin-top:18px">단계별 점검 가이드</div>
+        <div id="rxSteps"></div>
+      </div>
+
+      <div class="disclaimer">
+        본 진단서는 업로드된 이미지에 대한 AI의 일반적 정보 분석 결과이며, 특정 금융투자상품의 매수·매도를 권유하는
+        투자자문이 아닙니다. 캡처 화질에 따라 종목·비중 인식에 오차가 있을 수 있습니다. 투자에 대한 최종 판단과
+        책임은 투자자 본인에게 있으며, 중요한 의사결정 전에는 전문가와 상담하시기 바랍니다.
+      </div>
+    </div>
+    <div class="again">
+      <button class="btn ghost" id="resetBtn2" style="margin-left:0">다른 계좌 진단하기</button>
+    </div>
+  </section>
+
+</main>
+
+<footer>© 2026 계좌진단서 · 본 서비스는 정보 제공 목적이며 투자자문업 서비스가 아닙니다.</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   이 파일에는 API 키가 없습니다.
+   진단 요청은 /api/diagnose (서버리스 함수)로 보내고,
+   Gemini API 키는 Vercel 환경변수 GEMINI_API_KEY 에서만 읽습니다.
+   ═══════════════════════════════════════════════════════════ */
+
+const $ = id => document.getElementById(id);
+const dropZone=$('dropZone'), fileInput=$('fileInput'), preview=$('preview'),
+      thumbs=$('thumbs'), analyzeBtn=$('analyzeBtn'), errBox=$('errBox');
+const MAX_IMGS=4;
+let images=[]; // {b64, type, dataUrl}
+
+dropZone.addEventListener('click',()=>fileInput.click());
+dropZone.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')fileInput.click()});
+['dragover','dragenter'].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.add('drag')}));
+['dragleave','drop'].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.remove('drag')}));
+dropZone.addEventListener('drop',e=>addFiles(e.dataTransfer.files));
+fileInput.addEventListener('change',e=>{addFiles(e.target.files);fileInput.value=''});
+
+function addFiles(fileList){
+  const files=[...fileList].filter(f=>f.type.startsWith('image/'));
+  if(!files.length){showErr('이미지 파일만 업로드할 수 있어요.');return}
+  if(images.length+files.length>MAX_IMGS){showErr('캡처는 최대 '+MAX_IMGS+'장까지 올릴 수 있어요.');return}
+  errBox.style.display='none';
+  files.forEach(f=>{
+    const r=new FileReader();
+    r.onload=()=>{
+      images.push({b64:r.result.split(',')[1], type:f.type, dataUrl:r.result});
+      renderThumbs();
+    };
+    r.readAsDataURL(f);
+  });
+}
+
+function renderThumbs(){
+  thumbs.innerHTML='';
+  images.forEach((img,idx)=>{
+    const t=document.createElement('div');t.className='thumb';
+    const im=document.createElement('img');im.src=img.dataUrl;im.alt='캡처 '+(idx+1);
+    const x=document.createElement('button');x.textContent='×';x.title='삭제';
+    x.addEventListener('click',ev=>{ev.stopPropagation();images.splice(idx,1);renderThumbs()});
+    t.appendChild(im);t.appendChild(x);thumbs.appendChild(t);
+  });
+  if(images.length&&images.length<MAX_IMGS){
+    const add=document.createElement('div');add.className='add-more';add.textContent='+ 캡처 추가';
+    add.addEventListener('click',()=>fileInput.click());
+    thumbs.appendChild(add);
+  }
+  preview.style.display=images.length?'block':'none';
+  if(images.length)preview.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function showErr(msg){errBox.textContent='⚠️ '+msg;errBox.style.display='block'}
+
+function resetAll(){
+  images=[];fileInput.value='';
+  renderThumbs();
+  preview.style.display='none';$('report').style.display='none';
+  $('loading').style.display='none';errBox.style.display='none';
+  $('heroSec').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+$('resetBtn1').addEventListener('click',resetAll);
+$('resetBtn2').addEventListener('click',resetAll);
+
+const loadMsgs=['캡처에서 보유 종목을 읽는 중…','증권사 앱 화면을 판독하는 중…','자산 배분과 집중도를 계산하는 중…','미래 시나리오 대응력을 점검하는 중…','진단서를 작성하는 중…'];
+
+analyzeBtn.addEventListener('click',analyze);
+
+async function analyze(){
+  if(!images.length)return;
+  analyzeBtn.disabled=true;
+  $('heroSec').style.display='none';
+  $('loading').style.display='block';
+  let i=0;
+  const timer=setInterval(()=>{i=(i+1)%loadMsgs.length;$('loadTxt').textContent=loadMsgs[i]},3200);
+
+  const prompt=`당신은 포트폴리오 진단 전문가입니다. 첨부된 이미지들은 사용자의 증권사/거래소 앱(토스증권, 키움 영웅문, 삼성 mPOP, 미래에셋, NH, KB, 한국투자, 업비트 등 어떤 앱이든 가능)의 보유종목(잔고) 화면 캡처입니다.
+여러 장인 경우 같은 계좌를 스크롤하며 나눠 찍은 것이므로, 모든 이미지의 종목을 합쳐 하나의 포트폴리오로 판독하세요. 중복 종목은 한 번만 계산하세요.
+
+이미지에서 종목명, 평가금액(또는 비중), 수익률(%)을 읽어내세요. 앱마다 레이아웃이 달라도 화면의 텍스트를 그대로 판독하면 됩니다. 비중이 명시돼 있지 않으면 평가금액으로 계산하고, 금액이 가려져 있으면 보이는 정보로 합리적으로 추정하세요.
+
+아래 JSON 스키마로만 응답하세요. 마크다운, 백틱, 설명 문장 없이 순수 JSON만 출력하세요. 모든 텍스트는 한국어로 작성하세요.
+
+만약 이미지가 보유종목/잔고 화면이 아니거나(예: 거래내역, 차트, 무관한 사진) 종목을 읽을 수 없다면 {"error":"이유와 함께 잔고 화면 캡처를 안내"} 형태로만 응답하세요.
+
+주의: 특정 종목의 매수/매도를 직접 권유하지 말고, 분산·집중도·자산배분 관점의 일반적 점검 의견으로 서술하세요.
+
+스키마:
+{
+ "detected_app": "인식된 증권사/거래소 앱 이름 (확실하지 않으면 '증권사 앱')",
+ "grade": "A|B|C|D",
+ "score": 0-100 사이 정수,
+ "summary": "종합 소견 2~3문장",
+ "holdings": [{"name":"종목명","weight": 비중 숫자(%, 합계 약 100),"return_pct": 수익률 숫자(화면에 없으면 null)}],
+ "diagnosis": [
+   {"title":"진단 항목명(예: 집중도 리스크)","status":"good|warn|risk","detail":"1~2문장 설명"}
+ ] (4개 내외),
+ "scenarios": [
+   {"name":"금리 급등기","resilience":"강함|보통|취약","comment":"1문장","response":"이 시나리오가 실제로 왔을 때의 대응법 2~3문장. 반드시 이 사용자의 포트폴리오 구성을 근거로 작성하되, 특정 종목 매매 지시가 아닌 자산군·비중 관점의 일반적 대응 원칙으로 서술"},
+   {"name":"경기 침체","resilience":"강함|보통|취약","comment":"1문장","response":"동일 규칙"},
+   {"name":"강세장 랠리","resilience":"강함|보통|취약","comment":"1문장","response":"동일 규칙"}
+ ],
+ "actions": ["점검 포인트 문장", ...] (3~4개),
+ "prescription": {
+   "current_mix": [{"label":"자산군명(국내주식/미국주식/채권/금/현금 등)","pct": 숫자}],
+   "target_mix": [{"label":"자산군명","pct": 숫자}] (합계 100, 일반적 분산투자 원칙 기반의 참고 구조),
+   "target_title": "참고 배분의 컨셉 한 줄(예: 하락장 방어력 보강형)",
+   "rationale": "왜 이 방향인지 1~2문장 (특정 종목 언급 금지, 자산군 관점)",
+   "steps": [
+     {"period":"지금","action":"1문장"},
+     {"period":"1개월","action":"1문장"},
+     {"period":"3개월","action":"1문장"},
+     {"period":"분기마다","action":"재진단과 배분 점검을 유도하는 1문장"}
+   ]
+ }
+}
+
+처방(prescription) 작성 규칙: 특정 종목·상품명을 사거나 팔라고 지시하지 말 것. 자산군 단위의 배분 방향과 스스로 점검할 질문 형태로 서술할 것. "~하세요"보다 "~를 검토해보세요/점검해보세요" 톤을 유지할 것.`;
+
+  try{
+    // 자체 백엔드로 전송 (API 키는 서버에만 존재)
+    const res=await fetch("/api/diagnose",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        images: images.map(img=>({mime:img.type, data:img.b64})),
+        prompt
+      })
+    });
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error||('서버 오류 ('+res.status+')'));
+    const text=data.text||'';
+    const clean=text.replace(/```json|```/g,'').trim();
+    const start=clean.indexOf('{'), end=clean.lastIndexOf('}');
+    const parsed=JSON.parse(clean.slice(start,end+1));
+    if(parsed.error) throw new Error(parsed.error);
+    renderReport(parsed);
+  }catch(err){
+    console.error(err);
+    $('heroSec').style.display='block';
+    showErr((err.message&&err.message.length<160?err.message+' — ':'')+'진단에 실패했어요. 종목명과 금액이 잘 보이는 잔고 화면 캡처로 다시 시도해 주세요.');
+    errBox.scrollIntoView({behavior:'smooth',block:'center'});
+  }finally{
+    clearInterval(timer);
+    $('loading').style.display='none';
+    analyzeBtn.disabled=false;
+  }
+}
+
+function renderReport(d){
+  $('repDate').textContent=new Date().toLocaleDateString('ko-KR');
+  $('summaryTxt').textContent=d.summary||'';
+  $('stampGrade').textContent=d.grade||'B';
+
+  const appTag=$('appTag');
+  if(d.detected_app){appTag.textContent='📱 '+d.detected_app+' 화면으로 인식됨';appTag.style.display='block'}
+  else appTag.style.display='none';
+
+  const score=Math.max(0,Math.min(100,d.score||0));
+  $('scoreNum').textContent=score;
+  const C=351.8;
+  requestAnimationFrame(()=>{ $('gaugeArc').style.strokeDashoffset=C*(1-score/100); });
+
+  const hWrap=$('holdings');hWrap.innerHTML='';
+  (d.holdings||[]).slice(0,12).forEach(h=>{
+    const w=Math.max(0,Math.min(100,Number(h.weight)||0));
+    const row=document.createElement('div');row.className='hrow';
+    let rtHtml='<span class="rt flat">—</span>';
+    if(h.return_pct!==null&&h.return_pct!==undefined&&!isNaN(Number(h.return_pct))){
+      const r=Number(h.return_pct);
+      const cls=r>0?'up':(r<0?'down':'flat');
+      rtHtml='<span class="rt '+cls+'">'+(r>0?'+':'')+r.toFixed(1)+'%</span>';
+    }
+    row.innerHTML='<span class="nm"></span><span class="bar"><i style="width:0%"></i></span><span class="pc">'+w.toFixed(0)+'%</span>'+rtHtml;
+    row.querySelector('.nm').textContent=h.name;
+    hWrap.appendChild(row);
+    requestAnimationFrame(()=>{row.querySelector('i').style.width=w+'%'});
+  });
+
+  const badgeTxt={good:'양호',warn:'주의',risk:'위험'};
+  const dWrap=$('diagList');dWrap.innerHTML='';
+  (d.diagnosis||[]).forEach(x=>{
+    const st=['good','warn','risk'].includes(x.status)?x.status:'warn';
+    const el=document.createElement('div');el.className='diag-item';
+    el.innerHTML='<span class="badge '+st+'">'+badgeTxt[st]+'</span><div><h4></h4><p></p></div>';
+    el.querySelector('h4').textContent=x.title;
+    el.querySelector('p').textContent=x.detail;
+    dWrap.appendChild(el);
+  });
+
+  const sWrap=$('scnList');sWrap.innerHTML='';
+  (d.scenarios||[]).forEach(s=>{
+    const r=['강함','보통','취약'].includes(s.resilience)?s.resilience:'보통';
+    const el=document.createElement('div');el.className='scn-card';
+    el.innerHTML='<div class="scn-top"><h4></h4><div class="res '+r+'">'+(r==='강함'?'● 대응력 강함':r==='보통'?'◐ 대응력 보통':'○ 대응력 취약')+'</div></div><p class="cmt"></p>'
+      +(s.response?'<div class="scn-rsp"><span class="rsp-tag">이 장이 온다면</span><p></p></div>':'');
+    el.querySelector('h4').textContent=s.name;
+    el.querySelector('.cmt').textContent=s.comment;
+    if(s.response)el.querySelector('.scn-rsp p').textContent=s.response;
+    sWrap.appendChild(el);
+  });
+
+  const aWrap=$('actionList');aWrap.innerHTML='';
+  (d.actions||[]).forEach(a=>{
+    const li=document.createElement('li');li.textContent=a;aWrap.appendChild(li);
+  });
+
+  // 개선 처방
+  const rx=d.prescription;
+  const rxSec=$('rxSec');
+  if(rx&&Array.isArray(rx.target_mix)&&rx.target_mix.length){
+    const MIX_COLORS=['#1D9E75','#5DCAA5','#7F77DD','#EF9F27','#B4B2A9','#378ADD','#D85A30'];
+    const MIX_TEXT  =['#E1F5EE','#04342C','#EEEDFE','#412402','#2C2C2A','#E6F1FB','#FAECE7'];
+    function renderMix(el,mix){
+      el.innerHTML='';
+      (mix||[]).slice(0,7).forEach((m,i)=>{
+        const p=Math.max(0,Math.min(100,Number(m.pct)||0));
+        const seg=document.createElement('div');
+        seg.style.width=p+'%';
+        seg.style.background=MIX_COLORS[i%MIX_COLORS.length];
+        seg.style.color=MIX_TEXT[i%MIX_TEXT.length];
+        seg.textContent=p>=10?(m.label+' '+p.toFixed(0)+'%'):'';
+        seg.title=m.label+' '+p.toFixed(0)+'%';
+        el.appendChild(seg);
+      });
+    }
+    renderMix($('mixCurrent'),rx.current_mix);
+    renderMix($('mixTarget'),rx.target_mix);
+    $('rxConcept').textContent=rx.target_title?('— '+rx.target_title):'';
+    $('rxRationale').textContent=rx.rationale||'';
+    const sWrap2=$('rxSteps');sWrap2.innerHTML='';
+    (rx.steps||[]).forEach(s=>{
+      const el=document.createElement('div');el.className='rx-step';
+      el.innerHTML='<span class="period"></span><p></p>';
+      el.querySelector('.period').textContent=s.period;
+      el.querySelector('p').textContent=s.action;
+      sWrap2.appendChild(el);
+    });
+    rxSec.style.display='block';
+  }else{
+    rxSec.style.display='none';
+  }
+
+  $('report').style.display='block';
+  $('report').scrollIntoView({behavior:'smooth',block:'start'});
+  setTimeout(()=>$('stamp').classList.add('show'),700);
+}
+</script>
+</body>
+</html>
