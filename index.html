@@ -3,265 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>계좌진단 - AI 포트폴리오 리포트</title>
+<title>계좌진단 - AI 포트폴리오 점검</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
 <style>
-:root{
-  --bg:#f7f8fb;
-  --surface:#ffffff;
-  --surface-2:#f0f3f8;
-  --ink:#151923;
-  --text:#313847;
-  --muted:#727d91;
-  --soft:#dce2ec;
-  --line:#e7ebf2;
-  --brand:#125cff;
-  --brand-dark:#0d3eb3;
-  --mint:#11a870;
-  --amber:#d28b00;
-  --red:#df3f46;
-  --blue:#2e79ff;
-  --shadow:0 18px 50px rgba(25,34,54,.12);
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{
-  min-height:100vh;background:var(--bg);color:var(--ink);
-  font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif;
-  line-height:1.55;-webkit-font-smoothing:antialiased;
-}
-button,input{font:inherit}
-button{cursor:pointer}
-.wrap{width:min(1120px,calc(100% - 32px));margin:0 auto}
-.num{font-variant-numeric:tabular-nums}
-.topbar{position:sticky;top:0;z-index:20;background:rgba(247,248,251,.86);backdrop-filter:blur(16px);border-bottom:1px solid rgba(220,226,236,.72)}
-.topbar .wrap{height:64px;display:flex;align-items:center;justify-content:space-between;gap:18px}
-.logo{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:850;letter-spacing:0;color:var(--ink)}
-.logo-mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--brand),#15b87a);display:grid;place-items:center;color:#fff;font-weight:900}
-.nav-note{font-size:13px;color:var(--muted);white-space:nowrap}
-.hero{padding:38px 0 26px}
-.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) 410px;gap:28px;align-items:stretch}
-.intro{padding:30px 0 22px;display:flex;flex-direction:column;justify-content:center}
-.kicker{display:inline-flex;align-items:center;gap:8px;width:max-content;border:1px solid #cad6ea;background:#fff;color:var(--brand-dark);border-radius:999px;padding:7px 11px;font-size:13px;font-weight:800}
-.kicker::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--mint)}
-h1{margin-top:18px;font-size:clamp(32px,6vw,62px);line-height:1.08;letter-spacing:0;font-weight:900;color:var(--ink)}
-.lead{margin-top:18px;max-width:590px;color:var(--text);font-size:18px;line-height:1.7}
-.flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:28px;max-width:620px}
-.flow span{border:1px solid var(--line);background:#fff;border-radius:8px;padding:12px 13px;color:var(--text);font-size:14px;font-weight:750;box-shadow:0 8px 22px rgba(25,34,54,.05)}
-.flow b{display:block;color:var(--brand);font-size:12px;margin-bottom:3px}
-.support{margin-top:18px;color:var(--muted);font-size:14px}
-.upload-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:18px;display:flex;flex-direction:column;min-height:520px}
-.dropzone{position:relative;display:grid;place-items:center;text-align:center;min-height:300px;border:1.5px dashed #b7c3d6;border-radius:8px;background:linear-gradient(180deg,#fbfcff,#f4f7fb);transition:.18s ease;outline:none}
-.dropzone:hover,.dropzone.drag,.dropzone:focus-visible{border-color:var(--brand);background:#f4f8ff}
-.drop-icon{width:70px;height:70px;border-radius:18px;margin:0 auto 16px;background:#eaf1ff;display:grid;place-items:center;color:var(--brand)}
-.drop-icon svg{width:34px;height:34px}
-.dropzone h2{font-size:22px;line-height:1.3;letter-spacing:0}
-.dropzone p{margin-top:8px;color:var(--muted);font-size:14px}
-.dropzone input{display:none}
-.privacy{margin-top:14px;padding:13px 14px;border:1px solid var(--line);border-radius:8px;background:#fbfcfe;color:var(--text);font-size:13px}
-.privacy b{color:var(--brand-dark)}
-.preview{display:none;margin-top:14px}
-.thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.thumb,.add-more{position:relative;aspect-ratio:7/10;border-radius:8px;overflow:hidden;border:1px solid var(--line);background:var(--surface-2)}
-.thumb img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
-.thumb button{position:absolute;right:6px;top:6px;width:26px;height:26px;border:0;border-radius:50%;background:rgba(21,25,35,.82);color:#fff;font-size:17px;line-height:1}
-.add-more{display:grid;place-items:center;text-align:center;color:var(--brand);font-size:13px;font-weight:800;border-style:dashed;background:#f7faff}
-.actions{display:flex;gap:10px;margin-top:14px}
-.btn{border:0;border-radius:8px;background:var(--brand);color:#fff;font-weight:850;padding:14px 18px;min-height:48px;transition:.15s ease;display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:1}
-.btn:hover{background:var(--brand-dark)}
-.btn:active{transform:translateY(1px)}
-.btn:disabled{opacity:.55;cursor:wait}
-.btn.secondary{background:#fff;color:var(--text);border:1px solid var(--soft);flex:0 0 auto;padding-inline:16px}
-.btn.secondary:hover{background:#f3f6fb}
-.status{display:none;margin-top:14px;border-radius:8px;padding:14px;border:1px solid #ffd3d5;background:#fff5f5;color:#a52128;font-size:14px;line-height:1.6}
-.loading{display:none;margin-top:16px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:18px}
-.progress{height:8px;border-radius:999px;background:#e9edf5;overflow:hidden;margin-bottom:12px}
-.progress i{display:block;width:35%;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--brand),var(--mint));animation:slide 1.25s ease-in-out infinite}
-@keyframes slide{0%{transform:translateX(-110%)}100%{transform:translateX(310%)}}
-.loading strong{display:block;font-size:15px}.loading p{margin-top:4px;color:var(--muted);font-size:13px}
-.report{display:none;padding:22px 0 58px}.report-grid{display:grid;grid-template-columns:360px minmax(0,1fr);gap:16px;align-items:start}
-.panel{background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 28px rgba(25,34,54,.06);overflow:hidden;margin-bottom:12px}
-.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:14px 16px;background:#fbfcfe}
-.panel-head h3{font-size:16px;font-weight:850;letter-spacing:0}.panel-head span{font-size:12px;color:var(--muted)}
-.panel-body{padding:16px}.score-card{position:sticky;top:78px}
-.score-top{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}.label{font-size:13px;color:var(--muted);font-weight:700}
-.score{margin-top:2px;font-size:56px;line-height:1;font-weight:900;letter-spacing:0}.score small{font-size:17px;color:var(--muted);font-weight:750}
-.grade{min-width:76px;border-radius:8px;padding:12px;text-align:center;font-weight:900}.grade .g{font-size:32px;line-height:1}.grade .t{font-size:11px;margin-top:4px;letter-spacing:.08em}
-.grade-A{background:#eafaf4;color:var(--mint)}.grade-B{background:#edf4ff;color:var(--blue)}.grade-C{background:#fff6df;color:var(--amber)}.grade-D{background:#fff0f1;color:var(--red)}
-.scorebar{height:8px;border-radius:999px;background:#e8edf5;margin-top:16px;overflow:hidden}.scorebar i{display:block;height:100%;width:0;border-radius:999px;transition:width .8s ease}
-.summary{margin-top:16px;color:var(--text);font-size:15px;line-height:1.75}.app-tag{display:none;margin-top:14px;color:var(--muted);font-size:13px}.app-tag b{color:var(--ink)}
-.table-head,.holding{display:grid;grid-template-columns:minmax(0,1fr) 74px 86px;gap:10px;align-items:center}.table-head{padding:11px 16px;color:var(--muted);font-size:12px;font-weight:800;background:#fbfcfe;border-bottom:1px solid var(--line)}
-.table-head span:nth-child(2),.table-head span:nth-child(3),.holding .pct,.holding .ret{text-align:right}.holding{padding:13px 16px;border-bottom:1px solid var(--line)}.holding:last-child{border-bottom:0}
-.name{font-size:15px;font-weight:820;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bar{height:5px;background:#edf1f7;border-radius:999px;margin-top:7px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--brand);border-radius:999px;transition:width .7s ease}.pct,.ret{font-size:14px;font-weight:800}.ret.up{color:var(--red)}.ret.down{color:var(--blue)}.ret.flat{color:var(--muted)}
-.diag,.scenario,.step{padding:15px 16px;border-bottom:1px solid var(--line)}.diag:last-child,.scenario:last-child,.step:last-child{border-bottom:0}.diag{display:grid;grid-template-columns:68px 1fr;gap:12px}.badge{display:inline-flex;align-items:center;justify-content:center;width:58px;height:28px;border-radius:999px;font-size:12px;font-weight:900}.badge.good{background:#eafaf4;color:var(--mint)}.badge.warn{background:#fff6df;color:var(--amber)}.badge.risk{background:#fff0f1;color:var(--red)}
-.diag h4,.scenario h4{font-size:15px;font-weight:850}.diag p,.scenario p,.rx-copy{margin-top:5px;color:var(--text);font-size:14px;line-height:1.7}.scenario-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.pill{border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900;background:#edf1f7;color:var(--text);white-space:nowrap}.pill.강함{background:#eafaf4;color:var(--mint)}.pill.보통{background:#fff6df;color:var(--amber)}.pill.취약{background:#fff0f1;color:var(--red)}
-.response{margin-top:10px;padding:11px 12px;border-left:3px solid var(--brand);background:#f7faff;border-radius:0 8px 8px 0}.response b{display:block;color:var(--brand-dark);font-size:12px;margin-bottom:3px}.response p{margin-top:0}.actions-list{list-style:none}.actions-list li{position:relative;padding:13px 16px 13px 42px;border-bottom:1px solid var(--line);font-size:14px;color:var(--text)}.actions-list li:last-child{border-bottom:0}.actions-list li::before{content:"";position:absolute;left:17px;top:18px;width:10px;height:10px;border-radius:50%;background:var(--brand)}
-.mix{display:flex;height:34px;border-radius:8px;overflow:hidden;background:#edf1f7;margin:8px 0 13px}.mix div{display:flex;align-items:center;justify-content:center;min-width:0;font-size:11px;font-weight:900;white-space:nowrap;overflow:hidden}.rx-label{font-size:12px;font-weight:900;color:var(--muted);margin-top:14px}.rx-label:first-child{margin-top:0}.step{display:grid;grid-template-columns:72px 1fr;gap:12px}.period{display:inline-flex;align-items:center;justify-content:center;height:28px;border-radius:999px;background:#edf4ff;color:var(--brand);font-size:12px;font-weight:900}.disclaimer{width:min(1120px,calc(100% - 32px));margin:10px auto 0;color:var(--muted);font-size:12px;line-height:1.7}.again{display:flex;justify-content:center;margin-top:18px}.again .btn{max-width:240px}
-footer{padding:28px 0 44px;text-align:center;color:var(--muted);font-size:12px}
-@media(max-width:880px){.hero-grid,.report-grid{grid-template-columns:1fr}.intro{padding-top:18px}.upload-card{min-height:auto}.score-card{position:static}.flow{grid-template-columns:1fr}.nav-note{display:none}}
-@media(max-width:520px){.wrap{width:min(100% - 24px,1120px)}.topbar .wrap{height:58px}.hero{padding-top:20px}h1{font-size:34px}.lead{font-size:16px}.upload-card{padding:12px}.dropzone{min-height:250px}.thumbs{grid-template-columns:repeat(3,1fr)}.actions{flex-direction:column}.btn.secondary{flex:1}.table-head,.holding{grid-template-columns:minmax(0,1fr) 58px 74px}.score{font-size:48px}.diag{grid-template-columns:1fr}.scenario-top{align-items:flex-start;flex-direction:column}.step{grid-template-columns:1fr}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+:root{--bg:#070b12;--panel:#101722;--panel2:#151f2d;--panel3:#0d131d;--line:#263247;--line2:#1b2637;--ink:#eef3fb;--text:#c8d2e1;--muted:#7f8da3;--red:#ff4d57;--blue:#3f8cff;--green:#24d18b;--yellow:#ffbd3d;--brand:#2f7bff;--shadow:0 24px 70px rgba(0,0,0,.38)}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{min-height:100vh;background:radial-gradient(circle at 20% 0,#142033 0,#070b12 38%,#05080d 100%);color:var(--ink);font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}button,input{font:inherit}button{cursor:pointer}.num{font-variant-numeric:tabular-nums}.wrap{width:min(1180px,calc(100% - 32px));margin:0 auto}.topbar{position:sticky;top:0;z-index:30;background:rgba(7,11,18,.86);backdrop-filter:blur(18px);border-bottom:1px solid var(--line2)}.topbar .wrap{height:58px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:900}.brand i{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#2f7bff,#18c889);display:grid;place-items:center;font-style:normal;color:#fff}.topmeta{display:flex;gap:14px;align-items:center;color:var(--muted);font-size:12px}.market-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 16px var(--green)}
+.hero{padding:34px 0 26px}.terminal{display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:18px;align-items:stretch}.quote-board{background:linear-gradient(180deg,rgba(16,23,34,.92),rgba(9,14,22,.96));border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);overflow:hidden}.board-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line2);background:rgba(21,31,45,.72)}.tabs{display:flex;gap:6px}.tab{border:1px solid var(--line);background:#0b111b;color:var(--muted);border-radius:6px;padding:6px 10px;font-size:12px;font-weight:800}.tab.active{background:var(--brand);border-color:var(--brand);color:#fff}.board-time{font-size:12px;color:var(--muted)}.hero-copy{padding:34px 28px 22px}.eyebrow{display:inline-flex;align-items:center;gap:8px;color:#94b9ff;font-size:13px;font-weight:850}.eyebrow:before{content:"";width:7px;height:7px;background:var(--green);border-radius:50%}h1{margin-top:14px;font-size:clamp(34px,5.8vw,64px);line-height:1.05;font-weight:950;letter-spacing:0}.lead{max-width:680px;margin-top:16px;color:var(--text);font-size:18px;line-height:1.7}.ticker{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line2);margin-top:28px}.ticker div{padding:16px;border-right:1px solid var(--line2)}.ticker div:last-child{border-right:0}.ticker b{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}.ticker span{font-size:22px;font-weight:900}.ticker .up{color:var(--red)}.ticker .down{color:var(--blue)}.mini-table{padding:0 16px 18px}.mini-row{display:grid;grid-template-columns:1fr 72px 78px;gap:10px;padding:10px 0;border-bottom:1px solid var(--line2);font-size:13px}.mini-row:last-child{border-bottom:0}.mini-row strong{font-weight:850}.mini-row span:nth-child(2),.mini-row span:nth-child(3){text-align:right}.up{color:var(--red)}.down{color:var(--blue)}
+.upload-panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column}.account-card{background:var(--panel3);border:1px solid var(--line2);border-radius:8px;padding:13px 14px;margin-bottom:12px}.account-card .label{font-size:12px;color:var(--muted);font-weight:800}.asset-line{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-top:7px}.asset-line strong{font-size:27px;line-height:1;font-weight:950}.asset-line span{color:var(--red);font-size:13px;font-weight:850}.dropzone{min-height:245px;border:1px dashed #435372;border-radius:8px;background:#0b111a;display:grid;place-items:center;text-align:center;outline:none;transition:.16s}.dropzone:hover,.dropzone.drag,.dropzone:focus-visible{border-color:var(--brand);background:#101a2a}.drop-icon{width:62px;height:62px;border-radius:15px;margin:0 auto 14px;background:#13294e;display:grid;place-items:center;color:#6fa3ff}.drop-icon svg{width:31px;height:31px}.dropzone h2{font-size:20px}.dropzone p{margin-top:7px;color:var(--muted);font-size:13px}.dropzone input{display:none}.notice{margin-top:12px;border:1px solid var(--line2);background:#0c131e;border-radius:8px;padding:12px 13px;color:var(--text);font-size:12.5px;line-height:1.6}.notice b{color:#9ec0ff}.preview{display:none;margin-top:12px}.thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.thumb,.add-more{position:relative;aspect-ratio:7/10;border-radius:7px;overflow:hidden;border:1px solid var(--line);background:#0b111b}.thumb img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}.thumb button{position:absolute;right:5px;top:5px;width:24px;height:24px;border:0;border-radius:50%;background:rgba(0,0,0,.75);color:#fff;font-size:16px;line-height:1}.add-more{display:grid;place-items:center;color:#8eb4ff;font-size:13px;font-weight:900;border-style:dashed}.actions{display:grid;grid-template-columns:1fr 76px;gap:8px;margin-top:12px}.btn{border:0;border-radius:7px;background:var(--brand);color:#fff;font-weight:900;min-height:48px;padding:13px 16px}.btn:hover{filter:brightness(1.08)}.btn:disabled{opacity:.55;cursor:wait}.btn.secondary{background:#172131;color:var(--text);border:1px solid var(--line)}.status{display:none;margin-top:12px;border-radius:8px;padding:13px;border:1px solid rgba(255,77,87,.35);background:rgba(255,77,87,.1);color:#ff9da4;font-size:13px;line-height:1.6}.loading{display:none;margin-top:12px;border:1px solid var(--line);background:#0b111b;border-radius:8px;padding:15px}.progress{height:6px;border-radius:999px;background:#1a2434;overflow:hidden;margin-bottom:10px}.progress i{display:block;width:34%;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--brand),var(--green));animation:slide 1.2s ease-in-out infinite}@keyframes slide{0%{transform:translateX(-120%)}100%{transform:translateX(320%)}}.loading strong{font-size:14px}.loading p{font-size:12px;color:var(--muted);margin-top:3px}
+.report{display:none;padding:20px 0 58px}.report-grid{display:grid;grid-template-columns:360px minmax(0,1fr);gap:14px;align-items:start}.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:12px;box-shadow:0 14px 34px rgba(0,0,0,.22)}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line2);background:var(--panel2)}.panel-head h3{font-size:15px;font-weight:900}.panel-head span{font-size:12px;color:var(--muted)}.panel-body{padding:15px}.score-card{position:sticky;top:72px}.score-top{display:flex;justify-content:space-between;gap:16px}.label{font-size:12px;color:var(--muted);font-weight:800}.score{font-size:54px;line-height:1;font-weight:950;margin-top:4px}.score small{font-size:16px;color:var(--muted)}.grade{min-width:76px;border-radius:8px;padding:12px;text-align:center;font-weight:950;border:1px solid currentColor}.grade .g{font-size:32px;line-height:1}.grade .t{font-size:11px;margin-top:4px}.grade-A{background:rgba(36,209,139,.12);color:var(--green)}.grade-B{background:rgba(63,140,255,.13);color:var(--blue)}.grade-C{background:rgba(255,189,61,.13);color:var(--yellow)}.grade-D{background:rgba(255,77,87,.13);color:var(--red)}.scorebar{height:7px;border-radius:999px;background:#1a2434;overflow:hidden;margin-top:16px}.scorebar i{display:block;height:100%;width:0;border-radius:999px;transition:width .8s}.summary{margin-top:15px;color:var(--text);font-size:14px;line-height:1.75}.app-tag{display:none;margin-top:13px;color:var(--muted);font-size:12px}.app-tag b{color:var(--ink)}.table-head,.holding{display:grid;grid-template-columns:minmax(0,1fr) 74px 86px;gap:10px;align-items:center}.table-head{padding:9px 14px;color:var(--muted);font-size:11px;font-weight:900;background:#0c131d;border-bottom:1px solid var(--line2)}.table-head span:nth-child(2),.table-head span:nth-child(3),.holding .pct,.holding .ret{text-align:right}.holding{padding:12px 14px;border-bottom:1px solid var(--line2)}.holding:last-child{border-bottom:0}.name{font-size:14px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bar{height:3px;background:#1a2434;border-radius:999px;margin-top:7px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--yellow);border-radius:999px;transition:width .7s}.pct,.ret{font-size:13px;font-weight:850}.ret.up{color:var(--red)}.ret.down{color:var(--blue)}.ret.flat{color:var(--muted)}.diag,.scenario,.step{padding:13px 14px;border-bottom:1px solid var(--line2)}.diag:last-child,.scenario:last-child,.step:last-child{border-bottom:0}.diag{display:grid;grid-template-columns:58px 1fr;gap:12px}.badge{display:inline-flex;align-items:center;justify-content:center;height:26px;border-radius:5px;font-size:11px;font-weight:950}.badge.good{background:rgba(36,209,139,.13);color:var(--green)}.badge.warn{background:rgba(255,189,61,.13);color:var(--yellow)}.badge.risk{background:rgba(255,77,87,.13);color:var(--red)}.diag h4,.scenario h4{font-size:14px;font-weight:900}.diag p,.scenario p,.rx-copy{margin-top:4px;color:var(--text);font-size:13px;line-height:1.7}.scenario-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.pill{border-radius:5px;padding:4px 8px;font-size:11px;font-weight:950;background:#1a2434;color:var(--text);white-space:nowrap}.pill.강함{background:rgba(36,209,139,.13);color:var(--green)}.pill.보통{background:rgba(255,189,61,.13);color:var(--yellow)}.pill.취약{background:rgba(255,77,87,.13);color:var(--red)}.response{margin-top:9px;padding:10px 11px;border-left:3px solid var(--brand);background:#0b1422;border-radius:0 7px 7px 0}.response b{display:block;color:#91b9ff;font-size:11px;margin-bottom:3px}.actions-list{list-style:none}.actions-list li{position:relative;padding:12px 14px 12px 34px;border-bottom:1px solid var(--line2);font-size:13px;color:var(--text)}.actions-list li:last-child{border-bottom:0}.actions-list li:before{content:"";position:absolute;left:14px;top:18px;width:8px;height:8px;border-radius:50%;background:var(--brand)}.mix{display:flex;height:30px;border-radius:6px;overflow:hidden;background:#1a2434;margin:7px 0 12px}.mix div{display:flex;align-items:center;justify-content:center;min-width:0;font-size:10px;font-weight:900;white-space:nowrap;overflow:hidden}.rx-label{font-size:11px;font-weight:950;color:var(--muted);margin-top:12px}.rx-label:first-child{margin-top:0}.step{display:grid;grid-template-columns:68px 1fr;gap:10px}.period{display:inline-flex;align-items:center;justify-content:center;height:26px;border-radius:5px;background:rgba(63,140,255,.13);color:#8eb4ff;font-size:11px;font-weight:950}.disclaimer{width:min(1180px,calc(100% - 32px));margin:10px auto 0;color:var(--muted);font-size:11px;line-height:1.7}.again{display:flex;justify-content:center;margin-top:18px}.again .btn{max-width:220px}.footer{padding:28px 0 42px;text-align:center;color:var(--muted);font-size:11px}
+@media(max-width:900px){.terminal,.report-grid{grid-template-columns:1fr}.score-card{position:static}.ticker{grid-template-columns:1fr}.ticker div{border-right:0;border-bottom:1px solid var(--line2)}.ticker div:last-child{border-bottom:0}.topmeta span:not(:last-child){display:none}}@media(max-width:520px){.wrap{width:min(100% - 22px,1180px)}.topbar .wrap{height:54px}.hero{padding-top:20px}.hero-copy{padding:24px 18px 18px}h1{font-size:34px}.lead{font-size:15px}.upload-panel{padding:11px}.dropzone{min-height:220px}.thumbs{grid-template-columns:repeat(3,1fr)}.actions{grid-template-columns:1fr}.table-head,.holding{grid-template-columns:minmax(0,1fr) 58px 74px}.score{font-size:46px}.diag{grid-template-columns:1fr}.scenario-top{align-items:flex-start;flex-direction:column}.step{grid-template-columns:1fr}.note{display:none}}
 </style>
 </head>
 <body>
-<header class="topbar">
-  <div class="wrap">
-    <div class="logo"><span class="logo-mark">P</span><span>계좌진단</span></div>
-    <div class="nav-note">캡처 기반 AI 포트폴리오 리포트</div>
-  </div>
-</header>
+<header class="topbar"><div class="wrap"><div class="brand"><i>P</i><span>계좌진단</span></div><div class="topmeta"><span>KOSPI 2,942.31 <b class="up">+0.84%</b></span><span>NASDAQ 19,884.02 <b class="down">-0.21%</b></span><span class="market-dot"></span><span>AI Portfolio Desk</span></div></div></header>
 <main>
-  <section class="hero" id="heroSec">
-    <div class="wrap hero-grid">
-      <div class="intro">
-        <span class="kicker">잔고 화면만 있으면 시작</span>
-        <h1>내 포트폴리오,<br>캡처 한 장으로<br>바로 점검하세요.</h1>
-        <p class="lead">보유종목 화면을 올리면 구성, 집중도, 수익률 흐름, 시장 시나리오 대응력을 보기 쉬운 리포트로 정리합니다.</p>
-        <div class="flow">
-          <span><b>01</b>보유종목 캡처</span>
-          <span><b>02</b>최대 4장 업로드</span>
-          <span><b>03</b>진단 리포트 확인</span>
-        </div>
-        <p class="support">토스증권, 키움, 삼성, 미래에셋, NH, KB, 한국투자, 업비트 등 주요 화면을 지원합니다.</p>
-      </div>
-      <div class="upload-card">
-        <div class="dropzone" id="dropZone" role="button" tabindex="0" aria-label="보유종목 화면 캡처 업로드">
-          <div>
-            <div class="drop-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
-            </div>
-            <h2>캡처 이미지를 올려주세요</h2>
-            <p>클릭하거나 이곳에 끌어다 놓기</p>
-          </div>
-          <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp,image/gif" multiple>
-        </div>
-        <div class="privacy">이름, 계좌번호, 총자산은 가려도 괜찮습니다. <b>종목명과 평가금액</b>이 보이면 진단할 수 있어요.</div>
-        <div class="preview" id="preview">
-          <div class="thumbs" id="thumbs"></div>
-          <div class="actions">
-            <button class="btn" id="analyzeBtn">진단 시작</button>
-            <button class="btn secondary" id="resetBtn1">초기화</button>
-          </div>
-        </div>
-        <div class="loading" id="loading">
-          <div class="progress"><i></i></div>
-          <strong id="loadTxt">이미지에서 종목을 읽는 중입니다</strong>
-          <p>화면의 글자가 선명할수록 결과가 좋아집니다.</p>
-        </div>
-        <div class="status" id="errBox"></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="report" id="report">
-    <div class="wrap report-grid">
-      <aside class="panel score-card">
-        <div class="panel-head"><h3>진단 요약</h3><span id="repDate"></span></div>
-        <div class="panel-body">
-          <div class="score-top">
-            <div><div class="label">종합점수</div><div class="score num"><span id="scoreNum">0</span><small>/100</small></div></div>
-            <div class="grade grade-B" id="gradeBadge"><div class="g" id="stampGrade">B</div><div class="t">등급</div></div>
-          </div>
-          <div class="scorebar"><i id="scoreFill"></i></div>
-          <p class="summary" id="summaryTxt"></p>
-          <p class="app-tag" id="appTag"></p>
-        </div>
-      </aside>
-      <div>
-        <section class="panel">
-          <div class="panel-head"><h3>보유 구성</h3><span>AI 판독 결과</span></div>
-          <div class="table-head num"><span>종목명</span><span>비중</span><span>수익률</span></div>
-          <div id="holdings"></div>
-        </section>
-        <section class="panel"><div class="panel-head"><h3>항목별 진단</h3></div><div id="diagList"></div></section>
-        <section class="panel"><div class="panel-head"><h3>미래 시나리오 대응력</h3></div><div id="scnList"></div></section>
-        <section class="panel"><div class="panel-head"><h3>점검 포인트</h3></div><ul class="actions-list" id="actionList"></ul></section>
-        <section class="panel" id="rxSec" style="display:none">
-          <div class="panel-head"><h3>개선 처방</h3><span>참고용</span></div>
-          <div class="panel-body">
-            <div class="rx-label">현재 배분</div><div class="mix num" id="mixCurrent"></div>
-            <div class="rx-label">참고 배분 <span id="rxConcept"></span></div><div class="mix num" id="mixTarget"></div>
-            <p class="rx-copy" id="rxRationale"></p>
-            <div class="rx-label">단계별 점검 가이드</div><div id="rxSteps"></div>
-          </div>
-        </section>
-      </div>
-    </div>
-    <p class="disclaimer">본 리포트는 업로드 이미지에 대한 일반적 정보 분석이며 특정 금융상품의 매수나 매도를 권유하지 않습니다. 캡처 화질에 따라 판독 결과에 오차가 있을 수 있고, 투자 판단과 책임은 사용자 본인에게 있습니다.</p>
-    <div class="again"><button class="btn secondary" id="resetBtn2">다른 계좌 진단하기</button></div>
-  </section>
-</main>
-<footer>© 2026 계좌진단</footer>
+<section class="hero" id="heroSec"><div class="wrap terminal"><div class="quote-board"><div class="board-head"><div class="tabs"><span class="tab active">계좌진단</span><span class="tab">잔고</span><span class="tab">리스크</span></div><div class="board-time num" id="clock">09:00:00</div></div><div class="hero-copy"><span class="eyebrow">보유종목 캡처 즉시 분석</span><h1>계좌 화면 한 장이면<br>AI가 포트폴리오를<br>점검합니다.</h1><p class="lead">종목 구성, 집중도, 수익률 흐름, 미래 시장 대응력까지 증권사 앱 리포트처럼 빠르게 정리해요.</p><div class="ticker num"><div><b>진단 입력</b><span>1장</span></div><div><b>리포트 항목</b><span class="up">5개</span></div><div><b>예상 소요</b><span class="down">30초</span></div></div></div><div class="mini-table num"><div class="mini-row"><strong>집중도 리스크</strong><span>AI 판독</span><span class="up">CHECK</span></div><div class="mini-row"><strong>미래 시나리오</strong><span>금리/침체</span><span class="down">SIM</span></div><div class="mini-row"><strong>개선 처방</strong><span>자산군</span><span class="up">GUIDE</span></div></div></div><div class="upload-panel"><div class="account-card"><div class="label">AI 진단 대기 계좌</div><div class="asset-line num"><strong>캡처 업로드</strong><span>READY</span></div></div><div class="dropzone" id="dropZone" role="button" tabindex="0" aria-label="보유종목 화면 캡처 업로드"><div><div class="drop-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></div><h2>잔고 화면을 올려주세요</h2><p>클릭하거나 이곳에 끌어다 놓기</p></div><input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp,image/gif" multiple></div><div class="notice">이름, 계좌번호, 총자산은 가려도 괜찮습니다. <b>진단 시작 시 업로드 이미지는 AI 분석 서버로 전송</b>되며, 종목명과 평가금액이 보이면 진단할 수 있어요.</div><div class="preview" id="preview"><div class="thumbs" id="thumbs"></div><div class="actions"><button class="btn" id="analyzeBtn">진단 시작</button><button class="btn secondary" id="resetBtn1">초기화</button></div></div><div class="loading" id="loading"><div class="progress"><i></i></div><strong id="loadTxt">이미지에서 종목을 읽는 중입니다</strong><p>화면의 글자가 선명할수록 결과가 좋아집니다.</p></div><div class="status" id="errBox"></div></div></div></section>
+<section class="report" id="report"><div class="wrap report-grid"><aside class="panel score-card"><div class="panel-head"><h3>계좌 진단 요약</h3><span id="repDate"></span></div><div class="panel-body"><div class="score-top"><div><div class="label">종합점수</div><div class="score num"><span id="scoreNum">0</span><small>/100</small></div></div><div class="grade grade-B" id="gradeBadge"><div class="g" id="stampGrade">B</div><div class="t">등급</div></div></div><div class="scorebar"><i id="scoreFill"></i></div><p class="summary" id="summaryTxt"></p><p class="app-tag" id="appTag"></p></div></aside><div><section class="panel"><div class="panel-head"><h3>보유 구성</h3><span>AI 판독 결과</span></div><div class="table-head num"><span>종목명</span><span>비중</span><span>수익률</span></div><div id="holdings"></div></section><section class="panel"><div class="panel-head"><h3>항목별 진단</h3></div><div id="diagList"></div></section><section class="panel"><div class="panel-head"><h3>미래 시나리오 대응력</h3></div><div id="scnList"></div></section><section class="panel"><div class="panel-head"><h3>점검 포인트</h3></div><ul class="actions-list" id="actionList"></ul></section><section class="panel" id="rxSec" style="display:none"><div class="panel-head"><h3>개선 처방</h3><span>참고용</span></div><div class="panel-body"><div class="rx-label">현재 배분</div><div class="mix num" id="mixCurrent"></div><div class="rx-label">참고 배분 <span id="rxConcept"></span></div><div class="mix num" id="mixTarget"></div><p class="rx-copy" id="rxRationale"></p><div class="rx-label">단계별 점검 가이드</div><div id="rxSteps"></div></div></section></div></div><p class="disclaimer">본 리포트는 업로드 이미지에 대한 일반적 정보 분석이며 특정 금융상품의 매수나 매도를 권유하지 않습니다. 캡처 화질에 따라 판독 결과에 오차가 있을 수 있고, 투자 판단과 책임은 사용자 본인에게 있습니다.</p><div class="again"><button class="btn secondary" id="resetBtn2">다른 계좌 진단하기</button></div></section>
+</main><footer class="footer">© 2026 계좌진단 · AI Portfolio Desk</footer>
 <script>
-const $=id=>document.getElementById(id);
-const dropZone=$('dropZone'),fileInput=$('fileInput'),preview=$('preview'),thumbs=$('thumbs'),analyzeBtn=$('analyzeBtn'),errBox=$('errBox');
-const MAX_IMGS=4;let images=[];
-dropZone.addEventListener('click',()=>fileInput.click());
-dropZone.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();fileInput.click();}});
-['dragover','dragenter'].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.add('drag');}));
-['dragleave','drop'].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.remove('drag');}));
-dropZone.addEventListener('drop',e=>addFiles(e.dataTransfer.files));
-fileInput.addEventListener('change',e=>{addFiles(e.target.files);fileInput.value='';});
-function addFiles(fileList){
-  const files=[...fileList].filter(f=>f.type.startsWith('image/'));
-  if(!files.length)return showErr('이미지 파일만 업로드할 수 있어요.');
-  if(images.length+files.length>MAX_IMGS)return showErr('캡처는 최대 '+MAX_IMGS+'장까지 올릴 수 있어요.');
-  errBox.style.display='none';
-  files.forEach(f=>{const r=new FileReader();r.onload=()=>{images.push({b64:r.result.split(',')[1],type:f.type,dataUrl:r.result});renderThumbs();};r.readAsDataURL(f);});
-}
-function renderThumbs(){
-  thumbs.innerHTML='';
-  images.forEach((img,idx)=>{
-    const t=document.createElement('div');t.className='thumb';
-    const im=document.createElement('img');im.src=img.dataUrl;im.alt='업로드한 캡처 '+(idx+1);
-    const x=document.createElement('button');x.type='button';x.textContent='×';x.title='삭제';
-    x.addEventListener('click',ev=>{ev.stopPropagation();images.splice(idx,1);renderThumbs();});
-    t.append(im,x);thumbs.appendChild(t);
-  });
-  if(images.length&&images.length<MAX_IMGS){const add=document.createElement('button');add.type='button';add.className='add-more';add.textContent='+ 추가';add.addEventListener('click',()=>fileInput.click());thumbs.appendChild(add);}
-  preview.style.display=images.length?'block':'none';
-}
-function showErr(msg){errBox.textContent=msg;errBox.style.display='block';}
-function resetAll(){images=[];fileInput.value='';renderThumbs();preview.style.display='none';$('report').style.display='none';$('loading').style.display='none';errBox.style.display='none';$('heroSec').style.display='block';window.scrollTo({top:0,behavior:'smooth'});}
-$('resetBtn1').addEventListener('click',resetAll);$('resetBtn2').addEventListener('click',resetAll);
-const loadMsgs=['이미지에서 종목을 읽는 중입니다','비중과 수익률을 정리하는 중입니다','집중도와 분산 상태를 점검하는 중입니다','시장 시나리오 대응력을 계산하는 중입니다'];
-analyzeBtn.addEventListener('click',analyze);
-async function analyze(){
-  if(!images.length)return showErr('먼저 보유종목 화면 캡처를 올려주세요.');
-  analyzeBtn.disabled=true;$('loading').style.display='block';errBox.style.display='none';
-  let i=0;const timer=setInterval(()=>{i=(i+1)%loadMsgs.length;$('loadTxt').textContent=loadMsgs[i];},2600);
-  try{
-    const res=await fetch('/api/diagnose',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({images:images.map(img=>({mime:img.type,data:img.b64}))})});
-    const data=await res.json().catch(()=>({}));
-    if(!res.ok)throw new Error(data.error||'진단 서버에 연결하지 못했어요.');
-    if(data.error)throw new Error(data.error);
-    renderReport(data);
-    $('heroSec').style.display='none';$('report').style.display='block';$('report').scrollIntoView({behavior:'smooth',block:'start'});
-  }catch(err){
-    showErr(err.message||'진단에 실패했어요. 종목명과 금액이 잘 보이는 잔고 화면으로 다시 시도해 주세요.');
-  }finally{clearInterval(timer);$('loading').style.display='none';analyzeBtn.disabled=false;}
-}
-const GRADE_COLORS={A:'#11a870',B:'#2e79ff',C:'#d28b00',D:'#df3f46'};
-function renderReport(d){
-  $('repDate').textContent=new Date().toLocaleDateString('ko-KR');$('summaryTxt').textContent=d.summary||'';
-  const grade=['A','B','C','D'].includes(d.grade)?d.grade:'B';$('stampGrade').textContent=grade;$('gradeBadge').className='grade grade-'+grade;
-  const score=Math.max(0,Math.min(100,Number(d.score)||0));$('scoreNum').textContent=score;$('scoreFill').style.background=GRADE_COLORS[grade];requestAnimationFrame(()=>$('scoreFill').style.width=score+'%');
-  if(d.detected_app){$('appTag').innerHTML='인식된 앱 · <b></b>';$('appTag').querySelector('b').textContent=d.detected_app;$('appTag').style.display='block';}else $('appTag').style.display='none';
-  const hWrap=$('holdings');hWrap.innerHTML='';(d.holdings||[]).slice(0,14).forEach(h=>{const w=Math.max(0,Math.min(100,Number(h.weight)||0));const r=Number(h.return_pct);const has=h.return_pct!==null&&h.return_pct!==undefined&&!Number.isNaN(r);const cls=has?(r>0?'up':r<0?'down':'flat'):'flat';const row=document.createElement('div');row.className='holding num';row.innerHTML='<div><div class="name"></div><div class="bar"><i></i></div></div><div class="pct">'+w.toFixed(1)+'%</div><div class="ret '+cls+'">'+(has?((r>0?'+':'')+r.toFixed(2)+'%'):'-')+'</div>';row.querySelector('.name').textContent=h.name||'종목';hWrap.appendChild(row);requestAnimationFrame(()=>row.querySelector('i').style.width=w+'%');});
-  const badgeTxt={good:'양호',warn:'주의',risk:'위험'};const dWrap=$('diagList');dWrap.innerHTML='';(d.diagnosis||[]).forEach(x=>{const st=['good','warn','risk'].includes(x.status)?x.status:'warn';const el=document.createElement('div');el.className='diag';el.innerHTML='<span class="badge '+st+'">'+badgeTxt[st]+'</span><div><h4></h4><p></p></div>';el.querySelector('h4').textContent=x.title||'진단';el.querySelector('p').textContent=x.detail||'';dWrap.appendChild(el);});
-  const sWrap=$('scnList');sWrap.innerHTML='';(d.scenarios||[]).forEach(s=>{const r=['강함','보통','취약'].includes(s.resilience)?s.resilience:'보통';const el=document.createElement('div');el.className='scenario';el.innerHTML='<div class="scenario-top"><h4></h4><span class="pill '+r+'">대응력 '+r+'</span></div><p></p><div class="response"><b>이 장이 온다면</b><p></p></div>';el.querySelector('h4').textContent=s.name||'시나리오';el.querySelector('p').textContent=s.comment||'';el.querySelector('.response p').textContent=s.response||'';sWrap.appendChild(el);});
-  const aWrap=$('actionList');aWrap.innerHTML='';(d.actions||[]).forEach(a=>{const li=document.createElement('li');li.textContent=a;aWrap.appendChild(li);});
-  renderPrescription(d.prescription);
-}
-function renderPrescription(rx){
-  const rxSec=$('rxSec');if(!rx||!Array.isArray(rx.target_mix)||!rx.target_mix.length){rxSec.style.display='none';return;}
-  const colors=['#2e79ff','#15b87a','#8f6be8','#d28b00','#727d91','#df3f46'];
-  const text=['#fff','#062b1e','#fff','#321f00','#fff','#fff'];
-  const renderMix=(el,mix)=>{el.innerHTML='';(mix||[]).slice(0,6).forEach((m,i)=>{const p=Math.max(0,Math.min(100,Number(m.pct)||0));const seg=document.createElement('div');seg.style.width=p+'%';seg.style.background=colors[i%colors.length];seg.style.color=text[i%text.length];seg.textContent=p>=11?(m.label+' '+p.toFixed(0)+'%'):'';seg.title=m.label+' '+p.toFixed(0)+'%';el.appendChild(seg);});};
-  renderMix($('mixCurrent'),rx.current_mix);renderMix($('mixTarget'),rx.target_mix);$('rxConcept').textContent=rx.target_title?'· '+rx.target_title:'';$('rxRationale').textContent=rx.rationale||'';
-  const steps=$('rxSteps');steps.innerHTML='';(rx.steps||[]).forEach(s=>{const el=document.createElement('div');el.className='step';el.innerHTML='<span class="period"></span><p></p>';el.querySelector('.period').textContent=s.period||'';el.querySelector('p').textContent=s.action||'';steps.appendChild(el);});rxSec.style.display='block';
-}
+const DIAGNOSIS_PROMPT=`당신은 포트폴리오 진단 전문가입니다. 첨부된 이미지들은 사용자의 증권사/거래소 앱(토스증권, 키움, 삼성, 미래에셋, NH, KB, 한국투자, 업비트 등)의 보유종목 또는 잔고 화면 캡처입니다. 여러 장이면 같은 계좌를 스크롤하며 나눠 찍은 것으로 보고 모든 이미지의 종목을 합쳐 하나의 포트폴리오로 판독하세요. 중복 종목은 한 번만 계산하세요.
+이미지에서 종목명, 평가금액 또는 비중, 수익률을 읽어내세요. 비중이 명시돼 있지 않으면 평가금액으로 계산하고, 금액이 가려져 있으면 보이는 정보로 합리적으로 추정하세요.
+아래 JSON 스키마로만 응답하세요. 마크다운, 백틱, 설명 문장 없이 순수 JSON만 출력하세요. 모든 텍스트는 한국어로 작성하세요.
+이미지가 보유종목/잔고 화면이 아니거나 종목을 읽을 수 없다면 {"error":"이유와 함께 잔고 화면 캡처를 안내"} 형태로만 응답하세요.
+특정 종목의 매수/매도를 직접 권유하지 말고, 분산·집중도·자산배분 관점의 일반적 점검 의견으로 서술하세요.
+스키마:{"detected_app":"인식된 앱 이름","grade":"A|B|C|D","score":0,"summary":"종합 소견 2~3문장","holdings":[{"name":"종목명","weight":0,"return_pct":null}],"diagnosis":[{"title":"진단 항목명","status":"good|warn|risk","detail":"설명"}],"scenarios":[{"name":"금리 급등기","resilience":"강함|보통|취약","comment":"1문장","response":"이 시나리오에서의 자산군·비중 관점 대응 원칙"},{"name":"경기 침체","resilience":"강함|보통|취약","comment":"1문장","response":"이 시나리오에서의 자산군·비중 관점 대응 원칙"},{"name":"강세장 랠리","resilience":"강함|보통|취약","comment":"1문장","response":"이 시나리오에서의 자산군·비중 관점 대응 원칙"}],"actions":["점검 포인트"],"prescription":{"current_mix":[{"label":"자산군명","pct":0}],"target_mix":[{"label":"자산군명","pct":0}],"target_title":"참고 배분 컨셉","rationale":"왜 이 방향인지","steps":[{"period":"지금","action":"1문장"},{"period":"1개월","action":"1문장"},{"period":"3개월","action":"1문장"},{"period":"분기마다","action":"재진단과 배분 점검을 유도하는 1문장"}]}}`;
+const $=id=>document.getElementById(id);const dropZone=$('dropZone'),fileInput=$('fileInput'),preview=$('preview'),thumbs=$('thumbs'),analyzeBtn=$('analyzeBtn'),errBox=$('errBox');const MAX_IMGS=4;let images=[];
+setInterval(()=>{const d=new Date();$('clock').textContent=d.toLocaleTimeString('ko-KR',{hour12:false});},1000);
+dropZone.addEventListener('click',()=>fileInput.click());dropZone.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();fileInput.click();}});['dragover','dragenter'].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.add('drag');}));['dragleave','drop'].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.remove('drag');}));dropZone.addEventListener('drop',e=>addFiles(e.dataTransfer.files));fileInput.addEventListener('change',e=>{addFiles(e.target.files);fileInput.value='';});
+function addFiles(fileList){const files=[...fileList].filter(f=>f.type.startsWith('image/'));if(!files.length)return showErr('이미지 파일만 업로드할 수 있어요.');if(images.length+files.length>MAX_IMGS)return showErr('캡처는 최대 '+MAX_IMGS+'장까지 올릴 수 있어요.');errBox.style.display='none';files.forEach(f=>{const r=new FileReader();r.onload=()=>{images.push({b64:r.result.split(',')[1],type:f.type,dataUrl:r.result});renderThumbs();};r.readAsDataURL(f);});}
+function renderThumbs(){thumbs.innerHTML='';images.forEach((img,idx)=>{const t=document.createElement('div');t.className='thumb';const im=document.createElement('img');im.src=img.dataUrl;im.alt='업로드한 캡처 '+(idx+1);const x=document.createElement('button');x.type='button';x.textContent='×';x.title='삭제';x.addEventListener('click',ev=>{ev.stopPropagation();images.splice(idx,1);renderThumbs();});t.append(im,x);thumbs.appendChild(t);});if(images.length&&images.length<MAX_IMGS){const add=document.createElement('button');add.type='button';add.className='add-more';add.textContent='+ 추가';add.addEventListener('click',()=>fileInput.click());thumbs.appendChild(add);}preview.style.display=images.length?'block':'none';}
+function showErr(msg){errBox.textContent=msg;errBox.style.display='block';}function resetAll(){images=[];fileInput.value='';renderThumbs();preview.style.display='none';$('report').style.display='none';$('loading').style.display='none';errBox.style.display='none';$('heroSec').style.display='block';window.scrollTo({top:0,behavior:'smooth'});}$('resetBtn1').addEventListener('click',resetAll);$('resetBtn2').addEventListener('click',resetAll);
+const loadMsgs=['이미지에서 종목을 읽는 중입니다','비중과 수익률을 정리하는 중입니다','집중도와 분산 상태를 점검하는 중입니다','시장 시나리오 대응력을 계산하는 중입니다'];analyzeBtn.addEventListener('click',analyze);
+async function analyze(){if(!images.length)return showErr('먼저 보유종목 화면 캡처를 올려주세요.');analyzeBtn.disabled=true;$('loading').style.display='block';errBox.style.display='none';let i=0;const timer=setInterval(()=>{i=(i+1)%loadMsgs.length;$('loadTxt').textContent=loadMsgs[i];},2600);try{const res=await fetch('/api/diagnose',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({images:images.map(img=>({mime:img.type,data:img.b64})),prompt:DIAGNOSIS_PROMPT})});const raw=await res.json().catch(()=>({}));if(!res.ok)throw new Error(raw.error||'진단 서버에 연결하지 못했어요.');const data=normalizeResponse(raw);if(data.error)throw new Error(data.error);renderReport(data);$('heroSec').style.display='none';$('report').style.display='block';$('report').scrollIntoView({behavior:'smooth',block:'start'});}catch(err){showErr(err.message||'진단에 실패했어요. 종목명과 금액이 잘 보이는 잔고 화면으로 다시 시도해 주세요.');}finally{clearInterval(timer);$('loading').style.display='none';analyzeBtn.disabled=false;}}
+function normalizeResponse(raw){if(raw&&typeof raw.text==='string'){const clean=raw.text.replace(/```json|```/g,'').trim();const start=clean.indexOf('{'),end=clean.lastIndexOf('}');if(start>=0&&end>start)return JSON.parse(clean.slice(start,end+1));}return raw||{};}
+const GRADE_COLORS={A:'#24d18b',B:'#3f8cff',C:'#ffbd3d',D:'#ff4d57'};function renderReport(d){$('repDate').textContent=new Date().toLocaleDateString('ko-KR');$('summaryTxt').textContent=d.summary||'';const grade=['A','B','C','D'].includes(d.grade)?d.grade:'B';$('stampGrade').textContent=grade;$('gradeBadge').className='grade grade-'+grade;const score=Math.max(0,Math.min(100,Number(d.score)||0));$('scoreNum').textContent=score;$('scoreFill').style.background=GRADE_COLORS[grade];requestAnimationFrame(()=>$('scoreFill').style.width=score+'%');if(d.detected_app){$('appTag').innerHTML='인식된 앱 · <b></b>';$('appTag').querySelector('b').textContent=d.detected_app;$('appTag').style.display='block';}else $('appTag').style.display='none';const hWrap=$('holdings');hWrap.innerHTML='';(d.holdings||[]).slice(0,14).forEach(h=>{const w=Math.max(0,Math.min(100,Number(h.weight)||0));const r=Number(h.return_pct);const has=h.return_pct!==null&&h.return_pct!==undefined&&!Number.isNaN(r);const cls=has?(r>0?'up':r<0?'down':'flat'):'flat';const row=document.createElement('div');row.className='holding num';row.innerHTML='<div><div class="name"></div><div class="bar"><i></i></div></div><div class="pct">'+w.toFixed(1)+'%</div><div class="ret '+cls+'">'+(has?((r>0?'+':'')+r.toFixed(2)+'%'):'-')+'</div>';row.querySelector('.name').textContent=h.name||'종목';hWrap.appendChild(row);requestAnimationFrame(()=>row.querySelector('i').style.width=w+'%');});const badgeTxt={good:'양호',warn:'주의',risk:'위험'};const dWrap=$('diagList');dWrap.innerHTML='';(d.diagnosis||[]).forEach(x=>{const st=['good','warn','risk'].includes(x.status)?x.status:'warn';const el=document.createElement('div');el.className='diag';el.innerHTML='<span class="badge '+st+'">'+badgeTxt[st]+'</span><div><h4></h4><p></p></div>';el.querySelector('h4').textContent=x.title||'진단';el.querySelector('p').textContent=x.detail||'';dWrap.appendChild(el);});const sWrap=$('scnList');sWrap.innerHTML='';(d.scenarios||[]).forEach(s=>{const r=['강함','보통','취약'].includes(s.resilience)?s.resilience:'보통';const el=document.createElement('div');el.className='scenario';el.innerHTML='<div class="scenario-top"><h4></h4><span class="pill '+r+'">대응력 '+r+'</span></div><p></p><div class="response"><b>이 장이 온다면</b><p></p></div>';el.querySelector('h4').textContent=s.name||'시나리오';el.querySelector('p').textContent=s.comment||'';el.querySelector('.response p').textContent=s.response||'';sWrap.appendChild(el);});const aWrap=$('actionList');aWrap.innerHTML='';(d.actions||[]).forEach(a=>{const li=document.createElement('li');li.textContent=a;aWrap.appendChild(li);});renderPrescription(d.prescription);}
+function renderPrescription(rx){const rxSec=$('rxSec');if(!rx||!Array.isArray(rx.target_mix)||!rx.target_mix.length){rxSec.style.display='none';return;}const colors=['#3f8cff','#24d18b','#8c6cff','#ffbd3d','#7f8da3','#ff4d57'];const text=['#fff','#062b1e','#fff','#321f00','#fff','#fff'];const renderMix=(el,mix)=>{el.innerHTML='';(mix||[]).slice(0,6).forEach((m,i)=>{const p=Math.max(0,Math.min(100,Number(m.pct)||0));const seg=document.createElement('div');seg.style.width=p+'%';seg.style.background=colors[i%colors.length];seg.style.color=text[i%text.length];seg.textContent=p>=11?(m.label+' '+p.toFixed(0)+'%'):'';seg.title=m.label+' '+p.toFixed(0)+'%';el.appendChild(seg);});};renderMix($('mixCurrent'),rx.current_mix);renderMix($('mixTarget'),rx.target_mix);$('rxConcept').textContent=rx.target_title?'· '+rx.target_title:'';$('rxRationale').textContent=rx.rationale||'';const steps=$('rxSteps');steps.innerHTML='';(rx.steps||[]).forEach(s=>{const el=document.createElement('div');el.className='step';el.innerHTML='<span class="period"></span><p></p>';el.querySelector('.period').textContent=s.period||'';el.querySelector('p').textContent=s.action||'';steps.appendChild(el);});rxSec.style.display='block';}
 </script>
 </body>
 </html>
