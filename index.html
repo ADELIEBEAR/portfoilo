@@ -3,621 +3,264 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>계좌진단 — 캡처 한 장으로 받는 AI 포트폴리오 리포트</title>
+<title>계좌진단 - AI 포트폴리오 리포트</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
 <style>
-  :root{
-    --bg:#0C1017;
-    --panel:#141A24;
-    --panel-2:#1A2130;
-    --line:#242D3E;
-    --line-soft:#1D2534;
-    --ink:#EDF1F7;
-    --sub:#9AA5B8;
-    --muted:#5E6B82;
-    --up:#F5484D;
-    --up-bg:rgba(245,72,77,.12);
-    --down:#3D8BFF;
-    --down-bg:rgba(61,139,255,.12);
-    --gold:#F5B83D;
-    --good:#35D399;  --good-bg:rgba(53,211,153,.13);
-    --warn:#F5B83D;  --warn-bg:rgba(245,184,61,.13);
-    --risk:#F5484D;  --risk-bg:rgba(245,72,77,.13);
-    --num:'Pretendard Variable',Pretendard,sans-serif;
-  }
-  *{margin:0;padding:0;box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{
-    background:var(--bg);
-    color:var(--ink);
-    font-family:'Pretendard Variable',Pretendard,-apple-system,'Apple SD Gothic Neo',sans-serif;
-    line-height:1.5;
-    -webkit-font-smoothing:antialiased;
-  }
-  .num{font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-  .wrap{max-width:560px;margin:0 auto;padding:0 16px}
-
-  header{background:var(--bg);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line-soft)}
-  header .wrap{display:flex;align-items:center;justify-content:space-between;height:52px}
-  .logo{font-weight:800;font-size:17px;letter-spacing:-.02em;display:flex;align-items:center;gap:7px}
-  .logo i{width:8px;height:8px;border-radius:2px;background:var(--up);display:inline-block}
-  .hdr-note{font-size:11px;color:var(--muted);letter-spacing:.06em}
-
-  .hero{padding:44px 0 32px;text-align:center}
-  .hero .eyebrow{
-    display:inline-block;font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--gold);
-    border:1px solid rgba(245,184,61,.35);border-radius:4px;padding:5px 10px;margin-bottom:18px;
-  }
-  .hero h1{font-weight:800;font-size:clamp(24px,5.2vw,34px);line-height:1.4;letter-spacing:-.02em}
-  .hero h1 b{color:var(--up)}
-  .hero p.sub{margin:12px auto 0;max-width:420px;color:var(--sub);font-size:14px}
-  .hero .steps{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:20px;font-size:12px;color:var(--sub)}
-  .hero .steps span{background:var(--panel);border:1px solid var(--line-soft);border-radius:6px;padding:7px 11px}
-  .hero .steps b{color:var(--gold);margin-right:3px}
-  .apps{margin-top:12px;font-size:11.5px;color:var(--muted)}
-  .apps b{color:var(--sub);font-weight:600}
-
-  .uploader{
-    margin:26px auto 0;background:var(--panel);
-    border:1px dashed #35415A;border-radius:12px;
-    padding:30px 20px;cursor:pointer;transition:all .15s;text-align:center;
-  }
-  .uploader:hover,.uploader.drag{border-color:var(--up);background:#181F2C}
-  .uploader .icon{
-    width:46px;height:46px;margin:0 auto;border-radius:10px;background:var(--up-bg);
-    display:flex;align-items:center;justify-content:center;font-size:21px;
-  }
-  .uploader h3{font-size:15px;margin-top:12px;font-weight:700}
-  .uploader p{font-size:12.5px;color:var(--muted);margin-top:4px}
-  .uploader input{display:none}
-  .privacy{font-size:11.5px;color:var(--muted);margin-top:12px}
-  .privacy b{color:var(--gold);font-weight:600}
-  .tip{
-    margin:10px auto 0;background:var(--panel);border:1px solid var(--line-soft);
-    border-radius:10px;padding:12px 14px;font-size:12px;color:var(--sub);text-align:left;
-  }
-  .tip b{color:var(--ink)}
-
-  .preview{margin:16px auto 0;display:none;text-align:center}
-  .thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
-  .thumb{position:relative}
-  .thumb img{
-    width:100%;aspect-ratio:9/14;object-fit:cover;object-position:top;
-    border-radius:10px;border:1px solid var(--line);
-  }
-  .thumb button{
-    position:absolute;top:6px;right:6px;width:22px;height:22px;border:none;border-radius:50%;
-    background:rgba(0,0,0,.65);color:#fff;cursor:pointer;font-size:12px;line-height:1;
-  }
-  .add-more{
-    border:1px dashed #35415A;border-radius:10px;display:flex;align-items:center;justify-content:center;
-    color:var(--muted);font-size:12px;font-weight:500;cursor:pointer;aspect-ratio:9/14;background:var(--panel);
-  }
-  .add-more:hover{border-color:var(--up);color:var(--up)}
-
-  .btn{
-    display:inline-block;border:none;cursor:pointer;font-family:inherit;
-    background:var(--up);color:#fff;font-size:15px;font-weight:800;
-    padding:14px 34px;border-radius:8px;margin-top:16px;transition:all .12s;letter-spacing:-.01em;
-  }
-  .btn:hover{filter:brightness(1.08)}
-  .btn:active{transform:scale(.98)}
-  .btn:disabled{opacity:.45;cursor:wait}
-  .btn.ghost{background:var(--panel-2);color:var(--sub);font-weight:600;font-size:13px;padding:11px 20px;margin-left:8px;border:1px solid var(--line)}
-  .btn.ghost:hover{filter:none;background:#212A3C}
-
-  .loading{display:none;text-align:center;padding:52px 0}
-  .pulse{
-    width:40px;height:40px;margin:0 auto 16px;border-radius:50%;
-    border:3px solid var(--line);border-top-color:var(--up);
-    animation:spin .8s linear infinite;
-  }
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .loading p{color:var(--muted);font-size:12.5px}
-  .loading .step-txt{font-weight:700;color:var(--ink);font-size:14px;margin-bottom:5px}
-
-  .report{display:none;margin:20px auto 52px}
-  .panel{
-    background:var(--panel);border:1px solid var(--line-soft);border-radius:12px;
-    margin-bottom:10px;overflow:hidden;
-  }
-  .panel-hd{
-    display:flex;justify-content:space-between;align-items:center;
-    padding:13px 16px;border-bottom:1px solid var(--line-soft);
-  }
-  .panel-hd h3{font-size:13.5px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
-  .panel-hd .aux{font-size:11px;color:var(--muted)}
-  .panel-bd{padding:16px}
-
-  .acct-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-  .acct-top .lbl{font-size:12px;color:var(--sub)}
-  .acct-score{display:flex;align-items:baseline;gap:8px;margin-top:4px}
-  .acct-score b{font-size:38px;font-weight:800;letter-spacing:-.03em}
-  .acct-score span{font-size:13px;color:var(--muted)}
-  .grade-chip{
-    min-width:64px;text-align:center;border-radius:8px;padding:10px 12px;flex:none;
-    transform:scale(.7);opacity:0;transition:all .4s cubic-bezier(.2,1.5,.4,1);
-  }
-  .grade-chip.show{transform:scale(1);opacity:1}
-  .grade-chip .g{font-size:26px;font-weight:800;line-height:1}
-  .grade-chip .t{font-size:10px;font-weight:700;letter-spacing:.12em;margin-top:3px}
-  .grade-A{background:var(--good-bg);color:var(--good)}
-  .grade-B{background:var(--down-bg);color:var(--down)}
-  .grade-C{background:var(--warn-bg);color:var(--warn)}
-  .grade-D{background:var(--risk-bg);color:var(--risk)}
-  .score-track{height:5px;background:var(--line-soft);border-radius:99px;overflow:hidden;margin-top:14px}
-  .score-track i{display:block;height:100%;width:0%;border-radius:99px;transition:width 1s ease}
-  .summary-txt{font-size:13.5px;color:var(--sub);margin-top:14px;line-height:1.65}
-  .app-tag{display:none;font-size:11px;color:var(--muted);margin-top:10px}
-  .app-tag b{color:var(--sub)}
-
-  .col-hd{
-    display:grid;grid-template-columns:1fr 62px 76px;gap:8px;
-    padding:9px 16px;font-size:11px;color:var(--muted);
-    border-bottom:1px solid var(--line-soft);background:var(--panel-2);
-  }
-  .col-hd span:nth-child(2),.col-hd span:nth-child(3){text-align:right}
-  .hrow{
-    display:grid;grid-template-columns:1fr 62px 76px;gap:8px;align-items:center;
-    padding:12px 16px;border-bottom:1px solid var(--line-soft);
-  }
-  .hrow:last-child{border-bottom:none}
-  .hrow .nm{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .hrow .wbar{height:3px;background:var(--line-soft);border-radius:99px;overflow:hidden;margin-top:6px;max-width:120px}
-  .hrow .wbar i{display:block;height:100%;background:var(--gold);border-radius:99px;transition:width .8s ease}
-  .hrow .pc{font-size:13.5px;font-weight:600;text-align:right}
-  .hrow .rt{font-size:14px;font-weight:700;text-align:right}
-  .rt.up{color:var(--up)} .rt.down{color:var(--down)} .rt.flat{color:var(--muted)}
-
-  .diag-item{display:flex;gap:11px;padding:12px 16px;border-bottom:1px solid var(--line-soft)}
-  .diag-item:last-child{border-bottom:none}
-  .badge{
-    flex:none;font-size:11px;font-weight:700;border-radius:5px;padding:3px 8px;height:fit-content;margin-top:2px;
-  }
-  .badge.good{background:var(--good-bg);color:var(--good)}
-  .badge.warn{background:var(--warn-bg);color:var(--warn)}
-  .badge.risk{background:var(--risk-bg);color:var(--risk)}
-  .diag-item h4{font-size:13.5px;font-weight:700}
-  .diag-item p{font-size:12.5px;color:var(--sub);margin-top:3px}
-
-  .scn-card{padding:14px 16px;border-bottom:1px solid var(--line-soft)}
-  .scn-card:last-child{border-bottom:none}
-  .scn-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
-  .scn-card h4{font-size:13.5px;font-weight:700}
-  .scn-card .res{font-size:11px;font-weight:700;border-radius:5px;padding:3px 8px}
-  .res.강함{background:var(--good-bg);color:var(--good)}
-  .res.보통{background:var(--warn-bg);color:var(--warn)}
-  .res.취약{background:var(--risk-bg);color:var(--risk)}
-  .scn-card p.cmt{font-size:12.5px;color:var(--sub);margin-top:6px}
-  .scn-rsp{border-top:1px dashed var(--line);margin-top:10px;padding-top:10px}
-  .rsp-tag{font-size:10.5px;font-weight:800;letter-spacing:.08em;color:var(--gold)}
-  .scn-rsp p{font-size:12.5px;margin-top:6px;line-height:1.65;color:var(--ink)}
-
-  .actions li{
-    list-style:none;font-size:13px;padding:11px 16px 11px 38px;position:relative;
-    border-bottom:1px solid var(--line-soft);
-  }
-  .actions li:last-child{border-bottom:none}
-  .actions li::before{
-    content:"✓";position:absolute;left:16px;top:12px;
-    color:var(--gold);font-size:12px;font-weight:800;
-  }
-
-  .rx-note{font-size:11.5px;color:var(--muted);margin-bottom:14px}
-  .rx-label{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
-  .rx-concept{color:var(--gold);font-weight:700;letter-spacing:0}
-  .mixbar{display:flex;height:30px;border-radius:6px;overflow:hidden;margin-bottom:12px;background:var(--line-soft)}
-  .mixbar div{
-    display:flex;align-items:center;justify-content:center;
-    font-size:10.5px;font-weight:700;white-space:nowrap;overflow:hidden;transition:width .8s ease;
-  }
-  .rx-rationale{font-size:12.5px;color:var(--sub)}
-  .rx-step{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--line-soft)}
-  .rx-step:first-of-type{border-top:none}
-  .rx-step .period{
-    flex:none;font-size:11px;font-weight:700;border-radius:5px;padding:3px 8px;
-    height:fit-content;margin-top:2px;background:var(--panel-2);color:var(--gold);
-    border:1px solid var(--line);min-width:56px;text-align:center;
-  }
-  .rx-step p{font-size:12.5px;margin:0;color:var(--ink)}
-
-  .disclaimer{font-size:11px;color:var(--muted);line-height:1.7;padding:4px 6px 0}
-  .again{text-align:center;margin-top:18px}
-
-  .err{
-    display:none;margin:18px auto 0;background:var(--risk-bg);color:var(--risk);
-    border:1px solid rgba(245,72,77,.3);
-    border-radius:10px;padding:13px 16px;font-size:13px;font-weight:500;text-align:left;
-  }
-
-  footer{padding:32px 0 52px;text-align:center;color:var(--muted);font-size:11px}
-
-  @media (max-width:420px){
-    .col-hd,.hrow{grid-template-columns:1fr 52px 68px}
-    .acct-score b{font-size:32px}
-  }
-  @media (prefers-reduced-motion:reduce){
-    *{animation:none!important;transition:none!important}
-  }
+:root{
+  --bg:#f7f8fb;
+  --surface:#ffffff;
+  --surface-2:#f0f3f8;
+  --ink:#151923;
+  --text:#313847;
+  --muted:#727d91;
+  --soft:#dce2ec;
+  --line:#e7ebf2;
+  --brand:#125cff;
+  --brand-dark:#0d3eb3;
+  --mint:#11a870;
+  --amber:#d28b00;
+  --red:#df3f46;
+  --blue:#2e79ff;
+  --shadow:0 18px 50px rgba(25,34,54,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  min-height:100vh;background:var(--bg);color:var(--ink);
+  font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif;
+  line-height:1.55;-webkit-font-smoothing:antialiased;
+}
+button,input{font:inherit}
+button{cursor:pointer}
+.wrap{width:min(1120px,calc(100% - 32px));margin:0 auto}
+.num{font-variant-numeric:tabular-nums}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(247,248,251,.86);backdrop-filter:blur(16px);border-bottom:1px solid rgba(220,226,236,.72)}
+.topbar .wrap{height:64px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.logo{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:850;letter-spacing:0;color:var(--ink)}
+.logo-mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--brand),#15b87a);display:grid;place-items:center;color:#fff;font-weight:900}
+.nav-note{font-size:13px;color:var(--muted);white-space:nowrap}
+.hero{padding:38px 0 26px}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) 410px;gap:28px;align-items:stretch}
+.intro{padding:30px 0 22px;display:flex;flex-direction:column;justify-content:center}
+.kicker{display:inline-flex;align-items:center;gap:8px;width:max-content;border:1px solid #cad6ea;background:#fff;color:var(--brand-dark);border-radius:999px;padding:7px 11px;font-size:13px;font-weight:800}
+.kicker::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--mint)}
+h1{margin-top:18px;font-size:clamp(32px,6vw,62px);line-height:1.08;letter-spacing:0;font-weight:900;color:var(--ink)}
+.lead{margin-top:18px;max-width:590px;color:var(--text);font-size:18px;line-height:1.7}
+.flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:28px;max-width:620px}
+.flow span{border:1px solid var(--line);background:#fff;border-radius:8px;padding:12px 13px;color:var(--text);font-size:14px;font-weight:750;box-shadow:0 8px 22px rgba(25,34,54,.05)}
+.flow b{display:block;color:var(--brand);font-size:12px;margin-bottom:3px}
+.support{margin-top:18px;color:var(--muted);font-size:14px}
+.upload-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:18px;display:flex;flex-direction:column;min-height:520px}
+.dropzone{position:relative;display:grid;place-items:center;text-align:center;min-height:300px;border:1.5px dashed #b7c3d6;border-radius:8px;background:linear-gradient(180deg,#fbfcff,#f4f7fb);transition:.18s ease;outline:none}
+.dropzone:hover,.dropzone.drag,.dropzone:focus-visible{border-color:var(--brand);background:#f4f8ff}
+.drop-icon{width:70px;height:70px;border-radius:18px;margin:0 auto 16px;background:#eaf1ff;display:grid;place-items:center;color:var(--brand)}
+.drop-icon svg{width:34px;height:34px}
+.dropzone h2{font-size:22px;line-height:1.3;letter-spacing:0}
+.dropzone p{margin-top:8px;color:var(--muted);font-size:14px}
+.dropzone input{display:none}
+.privacy{margin-top:14px;padding:13px 14px;border:1px solid var(--line);border-radius:8px;background:#fbfcfe;color:var(--text);font-size:13px}
+.privacy b{color:var(--brand-dark)}
+.preview{display:none;margin-top:14px}
+.thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.thumb,.add-more{position:relative;aspect-ratio:7/10;border-radius:8px;overflow:hidden;border:1px solid var(--line);background:var(--surface-2)}
+.thumb img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.thumb button{position:absolute;right:6px;top:6px;width:26px;height:26px;border:0;border-radius:50%;background:rgba(21,25,35,.82);color:#fff;font-size:17px;line-height:1}
+.add-more{display:grid;place-items:center;text-align:center;color:var(--brand);font-size:13px;font-weight:800;border-style:dashed;background:#f7faff}
+.actions{display:flex;gap:10px;margin-top:14px}
+.btn{border:0;border-radius:8px;background:var(--brand);color:#fff;font-weight:850;padding:14px 18px;min-height:48px;transition:.15s ease;display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:1}
+.btn:hover{background:var(--brand-dark)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.55;cursor:wait}
+.btn.secondary{background:#fff;color:var(--text);border:1px solid var(--soft);flex:0 0 auto;padding-inline:16px}
+.btn.secondary:hover{background:#f3f6fb}
+.status{display:none;margin-top:14px;border-radius:8px;padding:14px;border:1px solid #ffd3d5;background:#fff5f5;color:#a52128;font-size:14px;line-height:1.6}
+.loading{display:none;margin-top:16px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:18px}
+.progress{height:8px;border-radius:999px;background:#e9edf5;overflow:hidden;margin-bottom:12px}
+.progress i{display:block;width:35%;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--brand),var(--mint));animation:slide 1.25s ease-in-out infinite}
+@keyframes slide{0%{transform:translateX(-110%)}100%{transform:translateX(310%)}}
+.loading strong{display:block;font-size:15px}.loading p{margin-top:4px;color:var(--muted);font-size:13px}
+.report{display:none;padding:22px 0 58px}.report-grid{display:grid;grid-template-columns:360px minmax(0,1fr);gap:16px;align-items:start}
+.panel{background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 28px rgba(25,34,54,.06);overflow:hidden;margin-bottom:12px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:14px 16px;background:#fbfcfe}
+.panel-head h3{font-size:16px;font-weight:850;letter-spacing:0}.panel-head span{font-size:12px;color:var(--muted)}
+.panel-body{padding:16px}.score-card{position:sticky;top:78px}
+.score-top{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}.label{font-size:13px;color:var(--muted);font-weight:700}
+.score{margin-top:2px;font-size:56px;line-height:1;font-weight:900;letter-spacing:0}.score small{font-size:17px;color:var(--muted);font-weight:750}
+.grade{min-width:76px;border-radius:8px;padding:12px;text-align:center;font-weight:900}.grade .g{font-size:32px;line-height:1}.grade .t{font-size:11px;margin-top:4px;letter-spacing:.08em}
+.grade-A{background:#eafaf4;color:var(--mint)}.grade-B{background:#edf4ff;color:var(--blue)}.grade-C{background:#fff6df;color:var(--amber)}.grade-D{background:#fff0f1;color:var(--red)}
+.scorebar{height:8px;border-radius:999px;background:#e8edf5;margin-top:16px;overflow:hidden}.scorebar i{display:block;height:100%;width:0;border-radius:999px;transition:width .8s ease}
+.summary{margin-top:16px;color:var(--text);font-size:15px;line-height:1.75}.app-tag{display:none;margin-top:14px;color:var(--muted);font-size:13px}.app-tag b{color:var(--ink)}
+.table-head,.holding{display:grid;grid-template-columns:minmax(0,1fr) 74px 86px;gap:10px;align-items:center}.table-head{padding:11px 16px;color:var(--muted);font-size:12px;font-weight:800;background:#fbfcfe;border-bottom:1px solid var(--line)}
+.table-head span:nth-child(2),.table-head span:nth-child(3),.holding .pct,.holding .ret{text-align:right}.holding{padding:13px 16px;border-bottom:1px solid var(--line)}.holding:last-child{border-bottom:0}
+.name{font-size:15px;font-weight:820;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bar{height:5px;background:#edf1f7;border-radius:999px;margin-top:7px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--brand);border-radius:999px;transition:width .7s ease}.pct,.ret{font-size:14px;font-weight:800}.ret.up{color:var(--red)}.ret.down{color:var(--blue)}.ret.flat{color:var(--muted)}
+.diag,.scenario,.step{padding:15px 16px;border-bottom:1px solid var(--line)}.diag:last-child,.scenario:last-child,.step:last-child{border-bottom:0}.diag{display:grid;grid-template-columns:68px 1fr;gap:12px}.badge{display:inline-flex;align-items:center;justify-content:center;width:58px;height:28px;border-radius:999px;font-size:12px;font-weight:900}.badge.good{background:#eafaf4;color:var(--mint)}.badge.warn{background:#fff6df;color:var(--amber)}.badge.risk{background:#fff0f1;color:var(--red)}
+.diag h4,.scenario h4{font-size:15px;font-weight:850}.diag p,.scenario p,.rx-copy{margin-top:5px;color:var(--text);font-size:14px;line-height:1.7}.scenario-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.pill{border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900;background:#edf1f7;color:var(--text);white-space:nowrap}.pill.강함{background:#eafaf4;color:var(--mint)}.pill.보통{background:#fff6df;color:var(--amber)}.pill.취약{background:#fff0f1;color:var(--red)}
+.response{margin-top:10px;padding:11px 12px;border-left:3px solid var(--brand);background:#f7faff;border-radius:0 8px 8px 0}.response b{display:block;color:var(--brand-dark);font-size:12px;margin-bottom:3px}.response p{margin-top:0}.actions-list{list-style:none}.actions-list li{position:relative;padding:13px 16px 13px 42px;border-bottom:1px solid var(--line);font-size:14px;color:var(--text)}.actions-list li:last-child{border-bottom:0}.actions-list li::before{content:"";position:absolute;left:17px;top:18px;width:10px;height:10px;border-radius:50%;background:var(--brand)}
+.mix{display:flex;height:34px;border-radius:8px;overflow:hidden;background:#edf1f7;margin:8px 0 13px}.mix div{display:flex;align-items:center;justify-content:center;min-width:0;font-size:11px;font-weight:900;white-space:nowrap;overflow:hidden}.rx-label{font-size:12px;font-weight:900;color:var(--muted);margin-top:14px}.rx-label:first-child{margin-top:0}.step{display:grid;grid-template-columns:72px 1fr;gap:12px}.period{display:inline-flex;align-items:center;justify-content:center;height:28px;border-radius:999px;background:#edf4ff;color:var(--brand);font-size:12px;font-weight:900}.disclaimer{width:min(1120px,calc(100% - 32px));margin:10px auto 0;color:var(--muted);font-size:12px;line-height:1.7}.again{display:flex;justify-content:center;margin-top:18px}.again .btn{max-width:240px}
+footer{padding:28px 0 44px;text-align:center;color:var(--muted);font-size:12px}
+@media(max-width:880px){.hero-grid,.report-grid{grid-template-columns:1fr}.intro{padding-top:18px}.upload-card{min-height:auto}.score-card{position:static}.flow{grid-template-columns:1fr}.nav-note{display:none}}
+@media(max-width:520px){.wrap{width:min(100% - 24px,1120px)}.topbar .wrap{height:58px}.hero{padding-top:20px}h1{font-size:34px}.lead{font-size:16px}.upload-card{padding:12px}.dropzone{min-height:250px}.thumbs{grid-template-columns:repeat(3,1fr)}.actions{flex-direction:column}.btn.secondary{flex:1}.table-head,.holding{grid-template-columns:minmax(0,1fr) 58px 74px}.score{font-size:48px}.diag{grid-template-columns:1fr}.scenario-top{align-items:flex-start;flex-direction:column}.step{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
-
-<header>
+<header class="topbar">
   <div class="wrap">
-    <div class="logo"><i></i>계좌진단</div>
-    <div class="hdr-note">AI PORTFOLIO REPORT</div>
+    <div class="logo"><span class="logo-mark">P</span><span>계좌진단</span></div>
+    <div class="nav-note">캡처 기반 AI 포트폴리오 리포트</div>
   </div>
 </header>
-
-<main class="wrap">
-
+<main>
   <section class="hero" id="heroSec">
-    <span class="eyebrow">AI 포트폴리오 진단</span>
-    <h1>보유종목 캡처 <b>한 장</b>이면<br>내 계좌 리포트가 나옵니다</h1>
-    <p class="sub">증권사 앱의 잔고(보유종목) 화면을 캡처해서 올려주세요. 구성·집중도·미래 시나리오 대응력까지 30초.</p>
-    <div class="steps">
-      <span><b>01</b>잔고 화면 캡처</span>
-      <span><b>02</b>업로드 (최대 4장)</span>
-      <span><b>03</b>리포트 확인</span>
-    </div>
-    <p class="apps"><b>모든 증권사 앱 지원</b> · 토스증권 · 키움 · 삼성 · 미래에셋 · NH · KB · 한투 · 업비트</p>
-
-    <div class="uploader" id="dropZone" role="button" tabindex="0" aria-label="보유종목 화면 캡처 업로드">
-      <div class="icon">📷</div>
-      <h3>보유종목 화면 캡처 올리기</h3>
-      <p>클릭하거나 끌어다 놓기 · 종목이 많으면 여러 장</p>
-      <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp,image/gif" multiple>
-    </div>
-    <p class="privacy">🔒 이미지는 진단에만 쓰입니다. <b>계좌번호·이름·총자산은 가려도 진단됩니다.</b></p>
-    <div class="tip">
-      <b>캡처 팁</b> — 거래내역 말고 <b>보유종목/잔고 화면</b>을 캡처해 주세요. 종목명과 평가금액이 보이면 충분하고, 수익률까지 보이면 더 정밀해집니다.
-    </div>
-
-    <div class="preview" id="preview">
-      <div class="thumbs" id="thumbs"></div>
-      <div>
-        <button class="btn" id="analyzeBtn">진단 시작</button>
-        <button class="btn ghost" id="resetBtn1">처음부터</button>
+    <div class="wrap hero-grid">
+      <div class="intro">
+        <span class="kicker">잔고 화면만 있으면 시작</span>
+        <h1>내 포트폴리오,<br>캡처 한 장으로<br>바로 점검하세요.</h1>
+        <p class="lead">보유종목 화면을 올리면 구성, 집중도, 수익률 흐름, 시장 시나리오 대응력을 보기 쉬운 리포트로 정리합니다.</p>
+        <div class="flow">
+          <span><b>01</b>보유종목 캡처</span>
+          <span><b>02</b>최대 4장 업로드</span>
+          <span><b>03</b>진단 리포트 확인</span>
+        </div>
+        <p class="support">토스증권, 키움, 삼성, 미래에셋, NH, KB, 한국투자, 업비트 등 주요 화면을 지원합니다.</p>
+      </div>
+      <div class="upload-card">
+        <div class="dropzone" id="dropZone" role="button" tabindex="0" aria-label="보유종목 화면 캡처 업로드">
+          <div>
+            <div class="drop-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+            </div>
+            <h2>캡처 이미지를 올려주세요</h2>
+            <p>클릭하거나 이곳에 끌어다 놓기</p>
+          </div>
+          <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp,image/gif" multiple>
+        </div>
+        <div class="privacy">이름, 계좌번호, 총자산은 가려도 괜찮습니다. <b>종목명과 평가금액</b>이 보이면 진단할 수 있어요.</div>
+        <div class="preview" id="preview">
+          <div class="thumbs" id="thumbs"></div>
+          <div class="actions">
+            <button class="btn" id="analyzeBtn">진단 시작</button>
+            <button class="btn secondary" id="resetBtn1">초기화</button>
+          </div>
+        </div>
+        <div class="loading" id="loading">
+          <div class="progress"><i></i></div>
+          <strong id="loadTxt">이미지에서 종목을 읽는 중입니다</strong>
+          <p>화면의 글자가 선명할수록 결과가 좋아집니다.</p>
+        </div>
+        <div class="status" id="errBox"></div>
       </div>
     </div>
-
-    <div class="err" id="errBox"></div>
-  </section>
-
-  <section class="loading" id="loading">
-    <div class="pulse" aria-hidden="true"></div>
-    <p class="step-txt" id="loadTxt">캡처에서 보유 종목을 읽는 중…</p>
-    <p>보통 10~20초 정도 걸립니다</p>
   </section>
 
   <section class="report" id="report">
-
-    <div class="panel">
-      <div class="panel-hd">
-        <h3>계좌 진단 요약</h3>
-        <span class="aux" id="repDate"></span>
-      </div>
-      <div class="panel-bd">
-        <div class="acct-top">
-          <div>
-            <div class="lbl">종합점수</div>
-            <div class="acct-score num"><b id="scoreNum">0</b><span>/ 100</span></div>
+    <div class="wrap report-grid">
+      <aside class="panel score-card">
+        <div class="panel-head"><h3>진단 요약</h3><span id="repDate"></span></div>
+        <div class="panel-body">
+          <div class="score-top">
+            <div><div class="label">종합점수</div><div class="score num"><span id="scoreNum">0</span><small>/100</small></div></div>
+            <div class="grade grade-B" id="gradeBadge"><div class="g" id="stampGrade">B</div><div class="t">등급</div></div>
           </div>
-          <div class="grade-chip grade-B" id="gradeBadge">
-            <div class="g" id="stampGrade">B</div>
-            <div class="t">등급</div>
-          </div>
+          <div class="scorebar"><i id="scoreFill"></i></div>
+          <p class="summary" id="summaryTxt"></p>
+          <p class="app-tag" id="appTag"></p>
         </div>
-        <div class="score-track"><i id="scoreFill"></i></div>
-        <p class="summary-txt" id="summaryTxt"></p>
-        <p class="app-tag" id="appTag"></p>
+      </aside>
+      <div>
+        <section class="panel">
+          <div class="panel-head"><h3>보유 구성</h3><span>AI 판독 결과</span></div>
+          <div class="table-head num"><span>종목명</span><span>비중</span><span>수익률</span></div>
+          <div id="holdings"></div>
+        </section>
+        <section class="panel"><div class="panel-head"><h3>항목별 진단</h3></div><div id="diagList"></div></section>
+        <section class="panel"><div class="panel-head"><h3>미래 시나리오 대응력</h3></div><div id="scnList"></div></section>
+        <section class="panel"><div class="panel-head"><h3>점검 포인트</h3></div><ul class="actions-list" id="actionList"></ul></section>
+        <section class="panel" id="rxSec" style="display:none">
+          <div class="panel-head"><h3>개선 처방</h3><span>참고용</span></div>
+          <div class="panel-body">
+            <div class="rx-label">현재 배분</div><div class="mix num" id="mixCurrent"></div>
+            <div class="rx-label">참고 배분 <span id="rxConcept"></span></div><div class="mix num" id="mixTarget"></div>
+            <p class="rx-copy" id="rxRationale"></p>
+            <div class="rx-label">단계별 점검 가이드</div><div id="rxSteps"></div>
+          </div>
+        </section>
       </div>
     </div>
-
-    <div class="panel">
-      <div class="panel-hd"><h3>보유 구성</h3><span class="aux">AI 판독 결과</span></div>
-      <div class="col-hd num"><span>종목명</span><span>비중</span><span>수익률</span></div>
-      <div id="holdings"></div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-hd"><h3>항목별 진단</h3></div>
-      <div id="diagList"></div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-hd"><h3>미래 시나리오 대응력</h3></div>
-      <div id="scnList"></div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-hd"><h3>점검 포인트</h3></div>
-      <ul class="actions" id="actionList"></ul>
-    </div>
-
-    <div class="panel" id="rxSec" style="display:none">
-      <div class="panel-hd"><h3>개선 처방</h3><span class="aux">참고용</span></div>
-      <div class="panel-bd">
-        <p class="rx-note">일반적인 분산투자 원칙에 따른 참고 구조입니다. 특정 종목 추천이 아닙니다.</p>
-        <div class="rx-label">현재 배분</div>
-        <div class="mixbar num" id="mixCurrent"></div>
-        <div class="rx-label">참고 배분 <span class="rx-concept" id="rxConcept"></span></div>
-        <div class="mixbar num" id="mixTarget"></div>
-        <p class="rx-rationale" id="rxRationale"></p>
-        <div class="rx-label" style="margin-top:18px">단계별 점검 가이드</div>
-        <div id="rxSteps"></div>
-      </div>
-    </div>
-
-    <p class="disclaimer">
-      본 리포트는 업로드된 이미지에 대한 AI의 일반적 정보 분석 결과이며, 특정 금융투자상품의 매수·매도를 권유하는 투자자문이 아닙니다. 캡처 화질에 따라 종목·비중 인식에 오차가 있을 수 있습니다. 투자에 대한 최종 판단과 책임은 투자자 본인에게 있습니다.
-    </p>
-    <div class="again">
-      <button class="btn ghost" id="resetBtn2" style="margin-left:0">다른 계좌 진단하기</button>
-    </div>
+    <p class="disclaimer">본 리포트는 업로드 이미지에 대한 일반적 정보 분석이며 특정 금융상품의 매수나 매도를 권유하지 않습니다. 캡처 화질에 따라 판독 결과에 오차가 있을 수 있고, 투자 판단과 책임은 사용자 본인에게 있습니다.</p>
+    <div class="again"><button class="btn secondary" id="resetBtn2">다른 계좌 진단하기</button></div>
   </section>
-
 </main>
-
-<footer>© 2026 계좌진단 · 본 서비스는 정보 제공 목적이며 투자자문업 서비스가 아닙니다.</footer>
-
+<footer>© 2026 계좌진단</footer>
 <script>
-const $ = id => document.getElementById(id);
-const dropZone=$('dropZone'), fileInput=$('fileInput'), preview=$('preview'),
-      thumbs=$('thumbs'), analyzeBtn=$('analyzeBtn'), errBox=$('errBox');
-const MAX_IMGS=4;
-let images=[];
-
+const $=id=>document.getElementById(id);
+const dropZone=$('dropZone'),fileInput=$('fileInput'),preview=$('preview'),thumbs=$('thumbs'),analyzeBtn=$('analyzeBtn'),errBox=$('errBox');
+const MAX_IMGS=4;let images=[];
 dropZone.addEventListener('click',()=>fileInput.click());
-dropZone.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')fileInput.click()});
-['dragover','dragenter'].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.add('drag')}));
-['dragleave','drop'].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.remove('drag')}));
+dropZone.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();fileInput.click();}});
+['dragover','dragenter'].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.add('drag');}));
+['dragleave','drop'].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.remove('drag');}));
 dropZone.addEventListener('drop',e=>addFiles(e.dataTransfer.files));
-fileInput.addEventListener('change',e=>{addFiles(e.target.files);fileInput.value=''});
-
+fileInput.addEventListener('change',e=>{addFiles(e.target.files);fileInput.value='';});
 function addFiles(fileList){
   const files=[...fileList].filter(f=>f.type.startsWith('image/'));
-  if(!files.length){showErr('이미지 파일만 업로드할 수 있어요.');return}
-  if(images.length+files.length>MAX_IMGS){showErr('캡처는 최대 '+MAX_IMGS+'장까지 올릴 수 있어요.');return}
+  if(!files.length)return showErr('이미지 파일만 업로드할 수 있어요.');
+  if(images.length+files.length>MAX_IMGS)return showErr('캡처는 최대 '+MAX_IMGS+'장까지 올릴 수 있어요.');
   errBox.style.display='none';
-  files.forEach(f=>{
-    const r=new FileReader();
-    r.onload=()=>{
-      images.push({b64:r.result.split(',')[1], type:f.type, dataUrl:r.result});
-      renderThumbs();
-    };
-    r.readAsDataURL(f);
-  });
+  files.forEach(f=>{const r=new FileReader();r.onload=()=>{images.push({b64:r.result.split(',')[1],type:f.type,dataUrl:r.result});renderThumbs();};r.readAsDataURL(f);});
 }
-
 function renderThumbs(){
   thumbs.innerHTML='';
   images.forEach((img,idx)=>{
     const t=document.createElement('div');t.className='thumb';
-    const im=document.createElement('img');im.src=img.dataUrl;im.alt='캡처 '+(idx+1);
-    const x=document.createElement('button');x.textContent='×';x.title='삭제';
-    x.addEventListener('click',ev=>{ev.stopPropagation();images.splice(idx,1);renderThumbs()});
-    t.appendChild(im);t.appendChild(x);thumbs.appendChild(t);
+    const im=document.createElement('img');im.src=img.dataUrl;im.alt='업로드한 캡처 '+(idx+1);
+    const x=document.createElement('button');x.type='button';x.textContent='×';x.title='삭제';
+    x.addEventListener('click',ev=>{ev.stopPropagation();images.splice(idx,1);renderThumbs();});
+    t.append(im,x);thumbs.appendChild(t);
   });
-  if(images.length&&images.length<MAX_IMGS){
-    const add=document.createElement('div');add.className='add-more';add.textContent='+ 캡처 추가';
-    add.addEventListener('click',()=>fileInput.click());
-    thumbs.appendChild(add);
-  }
+  if(images.length&&images.length<MAX_IMGS){const add=document.createElement('button');add.type='button';add.className='add-more';add.textContent='+ 추가';add.addEventListener('click',()=>fileInput.click());thumbs.appendChild(add);}
   preview.style.display=images.length?'block':'none';
-  if(images.length)preview.scrollIntoView({behavior:'smooth',block:'center'});
 }
-
-function showErr(msg){errBox.textContent=msg;errBox.style.display='block'}
-
-function resetAll(){
-  images=[];fileInput.value='';
-  renderThumbs();
-  preview.style.display='none';$('report').style.display='none';
-  $('loading').style.display='none';errBox.style.display='none';
-  $('heroSec').style.display='block';
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-$('resetBtn1').addEventListener('click',resetAll);
-$('resetBtn2').addEventListener('click',resetAll);
-
-const loadMsgs=['캡처에서 보유 종목을 읽는 중…','증권사 앱 화면을 판독하는 중…','자산 배분과 집중도를 계산하는 중…','미래 시나리오 대응력을 점검하는 중…','리포트를 만드는 중…'];
-
+function showErr(msg){errBox.textContent=msg;errBox.style.display='block';}
+function resetAll(){images=[];fileInput.value='';renderThumbs();preview.style.display='none';$('report').style.display='none';$('loading').style.display='none';errBox.style.display='none';$('heroSec').style.display='block';window.scrollTo({top:0,behavior:'smooth'});}
+$('resetBtn1').addEventListener('click',resetAll);$('resetBtn2').addEventListener('click',resetAll);
+const loadMsgs=['이미지에서 종목을 읽는 중입니다','비중과 수익률을 정리하는 중입니다','집중도와 분산 상태를 점검하는 중입니다','시장 시나리오 대응력을 계산하는 중입니다'];
 analyzeBtn.addEventListener('click',analyze);
-
 async function analyze(){
-  if(!images.length)return;
-  analyzeBtn.disabled=true;
-  $('heroSec').style.display='none';
-  $('loading').style.display='block';
-  let i=0;
-  const timer=setInterval(()=>{i=(i+1)%loadMsgs.length;$('loadTxt').textContent=loadMsgs[i]},3200);
-
-  const prompt=`당신은 포트폴리오 진단 전문가입니다. 첨부된 이미지들은 사용자의 증권사/거래소 앱(토스증권, 키움 영웅문, 삼성 mPOP, 미래에셋, NH, KB, 한국투자, 업비트 등 어떤 앱이든 가능)의 보유종목(잔고) 화면 캡처입니다.
-여러 장인 경우 같은 계좌를 스크롤하며 나눠 찍은 것이므로, 모든 이미지의 종목을 합쳐 하나의 포트폴리오로 판독하세요. 중복 종목은 한 번만 계산하세요.
-
-이미지에서 종목명, 평가금액(또는 비중), 수익률(%)을 읽어내세요. 앱마다 레이아웃이 달라도 화면의 텍스트를 그대로 판독하면 됩니다. 비중이 명시돼 있지 않으면 평가금액으로 계산하고, 금액이 가려져 있으면 보이는 정보로 합리적으로 추정하세요.
-
-아래 JSON 스키마로만 응답하세요. 마크다운, 백틱, 설명 문장 없이 순수 JSON만 출력하세요. 모든 텍스트는 한국어로 작성하세요.
-
-만약 이미지가 보유종목/잔고 화면이 아니거나(예: 거래내역, 차트, 무관한 사진) 종목을 읽을 수 없다면 {"error":"이유와 함께 잔고 화면 캡처를 안내"} 형태로만 응답하세요.
-
-주의: 특정 종목의 매수/매도를 직접 권유하지 말고, 분산·집중도·자산배분 관점의 일반적 점검 의견으로 서술하세요.
-
-스키마:
-{
- "detected_app": "인식된 증권사/거래소 앱 이름 (확실하지 않으면 '증권사 앱')",
- "grade": "A|B|C|D",
- "score": 0-100 사이 정수,
- "summary": "종합 소견 2~3문장",
- "holdings": [{"name":"종목명","weight": 비중 숫자(%, 합계 약 100),"return_pct": 수익률 숫자(화면에 없으면 null)}],
- "diagnosis": [
-   {"title":"진단 항목명(예: 집중도 리스크)","status":"good|warn|risk","detail":"1~2문장 설명"}
- ] (4개 내외),
- "scenarios": [
-   {"name":"금리 급등기","resilience":"강함|보통|취약","comment":"1문장","response":"이 시나리오가 실제로 왔을 때의 대응법 2~3문장. 반드시 이 사용자의 포트폴리오 구성을 근거로 작성하되, 특정 종목 매매 지시가 아닌 자산군·비중 관점의 일반적 대응 원칙으로 서술"},
-   {"name":"경기 침체","resilience":"강함|보통|취약","comment":"1문장","response":"동일 규칙"},
-   {"name":"강세장 랠리","resilience":"강함|보통|취약","comment":"1문장","response":"동일 규칙"}
- ],
- "actions": ["점검 포인트 문장", ...] (3~4개),
- "prescription": {
-   "current_mix": [{"label":"자산군명(국내주식/미국주식/채권/금/현금 등)","pct": 숫자}],
-   "target_mix": [{"label":"자산군명","pct": 숫자}] (합계 100, 일반적 분산투자 원칙 기반의 참고 구조),
-   "target_title": "참고 배분의 컨셉 한 줄(예: 하락장 방어력 보강형)",
-   "rationale": "왜 이 방향인지 1~2문장 (특정 종목 언급 금지, 자산군 관점)",
-   "steps": [
-     {"period":"지금","action":"1문장"},
-     {"period":"1개월","action":"1문장"},
-     {"period":"3개월","action":"1문장"},
-     {"period":"분기마다","action":"재진단과 배분 점검을 유도하는 1문장"}
-   ]
- }
-}
-
-처방(prescription) 작성 규칙: 특정 종목·상품명을 사거나 팔라고 지시하지 말 것. 자산군 단위의 배분 방향과 스스로 점검할 질문 형태로 서술할 것. "~하세요"보다 "~를 검토해보세요/점검해보세요" 톤을 유지할 것.`;
-
+  if(!images.length)return showErr('먼저 보유종목 화면 캡처를 올려주세요.');
+  analyzeBtn.disabled=true;$('loading').style.display='block';errBox.style.display='none';
+  let i=0;const timer=setInterval(()=>{i=(i+1)%loadMsgs.length;$('loadTxt').textContent=loadMsgs[i];},2600);
   try{
-    const res=await fetch("/api/diagnose",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        images: images.map(img=>({mime:img.type, data:img.b64})),
-        prompt
-      })
-    });
-    const data=await res.json();
-    if(!res.ok) throw new Error(data.error||('서버 오류 ('+res.status+')'));
-    const text=data.text||'';
-    const clean=text.replace(/```json|```/g,'').trim();
-    const start=clean.indexOf('{'), end=clean.lastIndexOf('}');
-    const parsed=JSON.parse(clean.slice(start,end+1));
-    if(parsed.error){
-      const e=new Error(parsed.error);
-      e.isAIMessage=true;
-      throw e;
-    }
-    renderReport(parsed);
+    const res=await fetch('/api/diagnose',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({images:images.map(img=>({mime:img.type,data:img.b64}))})});
+    const data=await res.json().catch(()=>({}));
+    if(!res.ok)throw new Error(data.error||'진단 서버에 연결하지 못했어요.');
+    if(data.error)throw new Error(data.error);
+    renderReport(data);
+    $('heroSec').style.display='none';$('report').style.display='block';$('report').scrollIntoView({behavior:'smooth',block:'start'});
   }catch(err){
-    console.error(err);
-    $('heroSec').style.display='block';
-    if(err.isAIMessage){
-      showErr(err.message);
-    }else{
-      showErr('진단에 실패했어요. 종목명과 금액이 잘 보이는 잔고 화면 캡처로 다시 시도해 주세요. 같은 문제가 반복되면 잠시 후 다시 이용해 주세요.');
-    }
-    errBox.scrollIntoView({behavior:'smooth',block:'center'});
-  }finally{
-    clearInterval(timer);
-    $('loading').style.display='none';
-    analyzeBtn.disabled=false;
-  }
+    showErr(err.message||'진단에 실패했어요. 종목명과 금액이 잘 보이는 잔고 화면으로 다시 시도해 주세요.');
+  }finally{clearInterval(timer);$('loading').style.display='none';analyzeBtn.disabled=false;}
 }
-
-const GRADE_COLORS={A:'#35D399',B:'#3D8BFF',C:'#F5B83D',D:'#F5484D'};
-
+const GRADE_COLORS={A:'#11a870',B:'#2e79ff',C:'#d28b00',D:'#df3f46'};
 function renderReport(d){
-  $('repDate').textContent='발급 '+new Date().toLocaleDateString('ko-KR');
-  $('summaryTxt').textContent=d.summary||'';
-
-  const grade=['A','B','C','D'].includes(d.grade)?d.grade:'B';
-  $('stampGrade').textContent=grade;
-  const badge=$('gradeBadge');
-  badge.className='grade-chip grade-'+grade;
-
-  const appTag=$('appTag');
-  if(d.detected_app){appTag.innerHTML='인식된 앱 · <b></b>';appTag.querySelector('b').textContent=d.detected_app;appTag.style.display='block'}
-  else appTag.style.display='none';
-
-  const score=Math.max(0,Math.min(100,d.score||0));
-  $('scoreNum').textContent=score;
-  const fill=$('scoreFill');
-  fill.style.background=GRADE_COLORS[grade];
-  requestAnimationFrame(()=>{ fill.style.width=score+'%'; });
-
-  const hWrap=$('holdings');hWrap.innerHTML='';
-  (d.holdings||[]).slice(0,12).forEach(h=>{
-    const w=Math.max(0,Math.min(100,Number(h.weight)||0));
-    const row=document.createElement('div');row.className='hrow num';
-    let rtHtml='<span class="rt flat">—</span>';
-    if(h.return_pct!==null&&h.return_pct!==undefined&&!isNaN(Number(h.return_pct))){
-      const r=Number(h.return_pct);
-      const cls=r>0?'up':(r<0?'down':'flat');
-      rtHtml='<span class="rt '+cls+'">'+(r>0?'+':'')+r.toFixed(2)+'%</span>';
-    }
-    row.innerHTML='<div><div class="nm"></div><div class="wbar"><i style="width:0%"></i></div></div><span class="pc">'+w.toFixed(1)+'%</span>'+rtHtml;
-    row.querySelector('.nm').textContent=h.name;
-    hWrap.appendChild(row);
-    requestAnimationFrame(()=>{row.querySelector('i').style.width=w+'%'});
-  });
-
-  const badgeTxt={good:'양호',warn:'주의',risk:'위험'};
-  const dWrap=$('diagList');dWrap.innerHTML='';
-  (d.diagnosis||[]).forEach(x=>{
-    const st=['good','warn','risk'].includes(x.status)?x.status:'warn';
-    const el=document.createElement('div');el.className='diag-item';
-    el.innerHTML='<span class="badge '+st+'">'+badgeTxt[st]+'</span><div><h4></h4><p></p></div>';
-    el.querySelector('h4').textContent=x.title;
-    el.querySelector('p').textContent=x.detail;
-    dWrap.appendChild(el);
-  });
-
-  const sWrap=$('scnList');sWrap.innerHTML='';
-  (d.scenarios||[]).forEach(s=>{
-    const r=['강함','보통','취약'].includes(s.resilience)?s.resilience:'보통';
-    const el=document.createElement('div');el.className='scn-card';
-    el.innerHTML='<div class="scn-top"><h4></h4><span class="res '+r+'">대응력 '+r+'</span></div><p class="cmt"></p>'
-      +(s.response?'<div class="scn-rsp"><span class="rsp-tag">이 장이 온다면</span><p></p></div>':'');
-    el.querySelector('h4').textContent=s.name;
-    el.querySelector('.cmt').textContent=s.comment;
-    if(s.response)el.querySelector('.scn-rsp p').textContent=s.response;
-    sWrap.appendChild(el);
-  });
-
-  const aWrap=$('actionList');aWrap.innerHTML='';
-  (d.actions||[]).forEach(a=>{
-    const li=document.createElement('li');li.textContent=a;aWrap.appendChild(li);
-  });
-
-  const rx=d.prescription;
-  const rxSec=$('rxSec');
-  if(rx&&Array.isArray(rx.target_mix)&&rx.target_mix.length){
-    const MIX_COLORS=['#3D8BFF','#7FB3FF','#8E76E8','#F5B83D','#5E6B82','#35D399','#F5484D'];
-    const MIX_TEXT  =['#0A1E3D','#0A1E3D','#F2EFFF','#3D2A00','#E5EAF2','#04331F','#FFE9EA'];
-    function renderMix(el,mix){
-      el.innerHTML='';
-      (mix||[]).slice(0,7).forEach((m,i)=>{
-        const p=Math.max(0,Math.min(100,Number(m.pct)||0));
-        const seg=document.createElement('div');
-        seg.style.width=p+'%';
-        seg.style.background=MIX_COLORS[i%MIX_COLORS.length];
-        seg.style.color=MIX_TEXT[i%MIX_TEXT.length];
-        seg.textContent=p>=10?(m.label+' '+p.toFixed(0)+'%'):'';
-        seg.title=m.label+' '+p.toFixed(0)+'%';
-        el.appendChild(seg);
-      });
-    }
-    renderMix($('mixCurrent'),rx.current_mix);
-    renderMix($('mixTarget'),rx.target_mix);
-    $('rxConcept').textContent=rx.target_title?('— '+rx.target_title):'';
-    $('rxRationale').textContent=rx.rationale||'';
-    const sWrap2=$('rxSteps');sWrap2.innerHTML='';
-    (rx.steps||[]).forEach(s=>{
-      const el=document.createElement('div');el.className='rx-step';
-      el.innerHTML='<span class="period"></span><p></p>';
-      el.querySelector('.period').textContent=s.period;
-      el.querySelector('p').textContent=s.action;
-      sWrap2.appendChild(el);
-    });
-    rxSec.style.display='block';
-  }else{
-    rxSec.style.display='none';
-  }
-
-  $('report').style.display='block';
-  $('report').scrollIntoView({behavior:'smooth',block:'start'});
-  setTimeout(()=>badge.classList.add('show'),500);
+  $('repDate').textContent=new Date().toLocaleDateString('ko-KR');$('summaryTxt').textContent=d.summary||'';
+  const grade=['A','B','C','D'].includes(d.grade)?d.grade:'B';$('stampGrade').textContent=grade;$('gradeBadge').className='grade grade-'+grade;
+  const score=Math.max(0,Math.min(100,Number(d.score)||0));$('scoreNum').textContent=score;$('scoreFill').style.background=GRADE_COLORS[grade];requestAnimationFrame(()=>$('scoreFill').style.width=score+'%');
+  if(d.detected_app){$('appTag').innerHTML='인식된 앱 · <b></b>';$('appTag').querySelector('b').textContent=d.detected_app;$('appTag').style.display='block';}else $('appTag').style.display='none';
+  const hWrap=$('holdings');hWrap.innerHTML='';(d.holdings||[]).slice(0,14).forEach(h=>{const w=Math.max(0,Math.min(100,Number(h.weight)||0));const r=Number(h.return_pct);const has=h.return_pct!==null&&h.return_pct!==undefined&&!Number.isNaN(r);const cls=has?(r>0?'up':r<0?'down':'flat'):'flat';const row=document.createElement('div');row.className='holding num';row.innerHTML='<div><div class="name"></div><div class="bar"><i></i></div></div><div class="pct">'+w.toFixed(1)+'%</div><div class="ret '+cls+'">'+(has?((r>0?'+':'')+r.toFixed(2)+'%'):'-')+'</div>';row.querySelector('.name').textContent=h.name||'종목';hWrap.appendChild(row);requestAnimationFrame(()=>row.querySelector('i').style.width=w+'%');});
+  const badgeTxt={good:'양호',warn:'주의',risk:'위험'};const dWrap=$('diagList');dWrap.innerHTML='';(d.diagnosis||[]).forEach(x=>{const st=['good','warn','risk'].includes(x.status)?x.status:'warn';const el=document.createElement('div');el.className='diag';el.innerHTML='<span class="badge '+st+'">'+badgeTxt[st]+'</span><div><h4></h4><p></p></div>';el.querySelector('h4').textContent=x.title||'진단';el.querySelector('p').textContent=x.detail||'';dWrap.appendChild(el);});
+  const sWrap=$('scnList');sWrap.innerHTML='';(d.scenarios||[]).forEach(s=>{const r=['강함','보통','취약'].includes(s.resilience)?s.resilience:'보통';const el=document.createElement('div');el.className='scenario';el.innerHTML='<div class="scenario-top"><h4></h4><span class="pill '+r+'">대응력 '+r+'</span></div><p></p><div class="response"><b>이 장이 온다면</b><p></p></div>';el.querySelector('h4').textContent=s.name||'시나리오';el.querySelector('p').textContent=s.comment||'';el.querySelector('.response p').textContent=s.response||'';sWrap.appendChild(el);});
+  const aWrap=$('actionList');aWrap.innerHTML='';(d.actions||[]).forEach(a=>{const li=document.createElement('li');li.textContent=a;aWrap.appendChild(li);});
+  renderPrescription(d.prescription);
+}
+function renderPrescription(rx){
+  const rxSec=$('rxSec');if(!rx||!Array.isArray(rx.target_mix)||!rx.target_mix.length){rxSec.style.display='none';return;}
+  const colors=['#2e79ff','#15b87a','#8f6be8','#d28b00','#727d91','#df3f46'];
+  const text=['#fff','#062b1e','#fff','#321f00','#fff','#fff'];
+  const renderMix=(el,mix)=>{el.innerHTML='';(mix||[]).slice(0,6).forEach((m,i)=>{const p=Math.max(0,Math.min(100,Number(m.pct)||0));const seg=document.createElement('div');seg.style.width=p+'%';seg.style.background=colors[i%colors.length];seg.style.color=text[i%text.length];seg.textContent=p>=11?(m.label+' '+p.toFixed(0)+'%'):'';seg.title=m.label+' '+p.toFixed(0)+'%';el.appendChild(seg);});};
+  renderMix($('mixCurrent'),rx.current_mix);renderMix($('mixTarget'),rx.target_mix);$('rxConcept').textContent=rx.target_title?'· '+rx.target_title:'';$('rxRationale').textContent=rx.rationale||'';
+  const steps=$('rxSteps');steps.innerHTML='';(rx.steps||[]).forEach(s=>{const el=document.createElement('div');el.className='step';el.innerHTML='<span class="period"></span><p></p>';el.querySelector('.period').textContent=s.period||'';el.querySelector('p').textContent=s.action||'';steps.appendChild(el);});rxSec.style.display='block';
 }
 </script>
 </body>
