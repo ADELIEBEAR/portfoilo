@@ -1,5 +1,9 @@
 {
   "name": "portfolio-checkup",
   "version": "1.0.0",
-  "type": "module"
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "vercel dev"
+  }
 }
