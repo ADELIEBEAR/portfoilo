@@ -7,6 +7,7 @@ const RESPONSE_SCHEMA = {
   type: "OBJECT",
   properties: {
     detected_app: { type: "STRING" },
+    confidence: { type: "NUMBER" },
     grade: { type: "STRING" },
     score: { type: "NUMBER" },
     summary: { type: "STRING" },
@@ -80,14 +81,16 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "이미지 파일만 진단할 수 있어요." });
   }
 
+  const instruction = `${prompt}\n\n판독 정확도 규칙:\n- 이미지에서 실제로 보이는 종목명만 holdings에 넣으세요. 예시 종목을 만들지 마세요.\n- 종목명이나 금액을 충분히 읽을 수 없으면 분석을 꾸미지 말고 error를 반환하세요.\n- confidence는 0~100으로 주세요. 종목명과 금액/비중을 2개 이상 읽으면 70 이상, 일부만 보이면 40~69, 잔고 화면인지 애매하면 40 미만입니다.\n- confidence가 55 미만이면 반드시 error만 반환하세요.\n- 응답은 반드시 유효한 JSON 객체 하나여야 합니다. JSON 외 문장, 마크다운, 마지막 쉼표를 절대 쓰지 마세요.`;
+
   const parts = [
-    ...safeImages.map(img => ({ inline_data: { mime_type: img.mime, data: img.data } })),
-    { text: `${prompt}\n\n중요: 응답은 반드시 유효한 JSON 객체 하나여야 합니다. JSON 외 문장, 마크다운, 마지막 쉼표를 절대 쓰지 마세요.` }
+    { text: instruction },
+    ...safeImages.map(img => ({ inline_data: { mime_type: img.mime, data: img.data } }))
   ];
 
   try {
     const text = await callGemini(parts, {
-      temperature: 0.1,
+      temperature: 0,
       maxOutputTokens: 4096,
       responseMimeType: "application/json",
       responseSchema: RESPONSE_SCHEMA
@@ -104,7 +107,7 @@ export default async function handler(req, res) {
     return res.status(200).json(normalizeDiagnosis(parsed));
   } catch (e) {
     console.error("[Diagnosis server error]", e);
-    return res.status(500).json({ error: "AI 응답을 리포트로 정리하지 못했어요. 같은 캡처로 한 번만 다시 시도해 주세요." });
+    return res.status(500).json({ error: "지금은 리포트를 만들지 못했어요. 더 선명한 잔고 화면으로 다시 시도해 주세요." });
   }
 }
 
@@ -170,21 +173,51 @@ function repairCommonJsonIssues(text) {
 
 function normalizeDiagnosis(data) {
   if (data?.error) return { error: String(data.error) };
-  return {
-    detected_app: data?.detected_app || "증권사 앱",
-    grade: ["A", "B", "C", "D"].includes(data?.grade) ? data.grade : "B",
-    score: clampNumber(data?.score, 0, 100, 70),
-    summary: data?.summary || "업로드한 잔고 화면을 기준으로 포트폴리오 구성을 점검했어요.",
-    holdings: Array.isArray(data?.holdings) ? data.holdings.map(h => ({
-      name: h?.name || "종목",
+
+  const holdings = Array.isArray(data?.holdings) ? data.holdings
+    .map(h => ({
+      name: cleanText(h?.name || "종목", 32),
       weight: clampNumber(h?.weight, 0, 100, 0),
       return_pct: h?.return_pct === null || h?.return_pct === undefined ? null : Number(h.return_pct)
+    }))
+    .filter(h => h.name && h.name !== "종목") : [];
+
+  const confidence = clampNumber(data?.confidence, 0, 100, holdings.length >= 2 ? 70 : 40);
+  const readableHoldings = holdings.filter(h => h.weight > 0 || h.return_pct !== null).length;
+
+  if (confidence < 55 || holdings.length < 1 || readableHoldings < 1) {
+    return { error: "종목명과 평가금액이 더 잘 보이는 잔고 화면으로 다시 올려주세요." };
+  }
+
+  return {
+    detected_app: cleanText(data?.detected_app || "잔고 화면", 24),
+    confidence,
+    grade: ["A", "B", "C", "D"].includes(data?.grade) ? data.grade : "B",
+    score: clampNumber(data?.score, 0, 100, 70),
+    summary: cleanText(data?.summary || "업로드한 잔고 화면을 기준으로 계좌 구성을 점검했어요.", 220),
+    holdings,
+    diagnosis: Array.isArray(data?.diagnosis) ? data.diagnosis.map(item => ({
+      title: cleanText(item?.title || "확인할 점", 36),
+      status: ["good", "warn", "risk"].includes(item?.status) ? item.status : "warn",
+      detail: cleanText(item?.detail || "화면 기준으로 추가 확인이 필요합니다.", 180)
     })) : [],
-    diagnosis: Array.isArray(data?.diagnosis) ? data.diagnosis : [],
-    scenarios: Array.isArray(data?.scenarios) ? data.scenarios : [],
-    actions: Array.isArray(data?.actions) ? data.actions : [],
+    scenarios: Array.isArray(data?.scenarios) ? data.scenarios.map(item => ({
+      name: cleanText(item?.name || "시장 상황", 28),
+      resilience: ["강함", "보통", "취약"].includes(item?.resilience) ? item.resilience : "보통",
+      comment: cleanText(item?.comment || "화면 기준으로 판단했습니다.", 140),
+      response: cleanText(item?.response || "비중과 현금 여력을 함께 확인해 보세요.", 140)
+    })) : [],
+    actions: Array.isArray(data?.actions) ? data.actions.map(a => cleanText(a, 140)).slice(0, 5) : [],
     prescription: data?.prescription || null
   };
+}
+
+function cleanText(value, max) {
+  const text = String(value || "")
+    .replace(/([ㄱ-ㅎㅏ-ㅣ가-힣A-Za-z0-9])\1{4,}/g, "$1$1")
+    .replace(/[\s\n]+/g, " ")
+    .trim();
+  return text.length > max ? `${text.slice(0, max).trim()}...` : text;
 }
 
 function clampNumber(value, min, max, fallback) {
