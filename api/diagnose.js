@@ -16,7 +16,7 @@
 //        body: JSON.stringify({ images: [{mime, data}], prompt }) })
 // ═══════════════════════════════════════════════════════════
 
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
 export default async function handler(req, res) {
   if (!process.env.GEMINI_API_KEY) {
@@ -58,7 +58,11 @@ export default async function handler(req, res) {
 
     const data = await r.json();
     if (!r.ok) {
-      return res.status(r.status).json({ error: data.error?.message || "Gemini API 오류" });
+      // 실제 에러는 서버 로그에만 남김 (Vercel 대시보드 > Logs 에서 확인)
+      console.error("[Gemini API error]", r.status, data.error?.message || data);
+      return res.status(502).json({
+        error: "진단 서버에 일시적인 문제가 발생했어요. 잠시 후 다시 시도해 주세요."
+      });
     }
 
     const text = (data.candidates?.[0]?.content?.parts || [])
@@ -68,6 +72,9 @@ export default async function handler(req, res) {
     // ⚠️ 개인정보 보호: 이미지는 어디에도 저장하지 않고 그대로 폐기됨
     return res.status(200).json({ text });
   } catch (e) {
-    return res.status(500).json({ error: "서버 오류: " + e.message });
+    console.error("[Server error]", e);
+    return res.status(500).json({
+      error: "진단 서버에 일시적인 문제가 발생했어요. 잠시 후 다시 시도해 주세요."
+    });
   }
 }

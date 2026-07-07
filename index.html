@@ -526,12 +526,20 @@ async function analyze(){
     const clean=text.replace(/```json|```/g,'').trim();
     const start=clean.indexOf('{'), end=clean.lastIndexOf('}');
     const parsed=JSON.parse(clean.slice(start,end+1));
-    if(parsed.error) throw new Error(parsed.error);
+    if(parsed.error){
+      const e=new Error(parsed.error);
+      e.isAIMessage=true; // AI가 사용자에게 쓴 안내 (예: 잔고 화면이 아님)
+      throw e;
+    }
     renderReport(parsed);
   }catch(err){
     console.error(err);
     $('heroSec').style.display='block';
-    showErr((err.message&&err.message.length<160?err.message+' — ':'')+'진단에 실패했어요. 종목명과 금액이 잘 보이는 잔고 화면 캡처로 다시 시도해 주세요.');
+    if(err.isAIMessage){
+      showErr(err.message);
+    }else{
+      showErr('진단에 실패했어요. 종목명과 금액이 잘 보이는 잔고 화면 캡처로 다시 시도해 주세요. 같은 문제가 반복되면 잠시 후 다시 이용해 주세요.');
+    }
     errBox.scrollIntoView({behavior:'smooth',block:'center'});
   }finally{
     clearInterval(timer);
