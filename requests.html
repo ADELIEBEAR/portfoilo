@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>전문진단 요청 목록</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{background:#f4f6f9;color:#111827;font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif}.wrap{width:min(1080px,calc(100% - 32px));margin:0 auto;padding:34px 0}.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:18px}.top h1{font-size:28px}.top p{margin-top:6px;color:#667085;font-size:14px}.auth{display:grid;grid-template-columns:1fr 120px;gap:8px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:14px}.auth input{height:46px;border:1px solid #d8e0eb;border-radius:8px;padding:0 12px;font:inherit}.auth button{border:0;border-radius:8px;background:#235eff;color:#fff;font-weight:900}.status{color:#b42332;font-size:13px;margin:10px 2px}.table{background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden}.row{display:grid;grid-template-columns:150px 120px 80px 80px minmax(0,1fr);gap:12px;padding:13px 14px;border-bottom:1px solid #edf1f6;align-items:center;font-size:13px}.row.head{background:#f8fafc;color:#667085;font-weight:900;font-size:12px}.row:last-child{border-bottom:0}.phone{font-weight:900}.score{font-variant-numeric:tabular-nums;font-weight:900}.summary{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#344054}.empty{padding:30px;text-align:center;color:#667085}.link{color:#235eff;text-decoration:none;font-size:13px;font-weight:800}@media(max-width:760px){.top{display:block}.auth{grid-template-columns:1fr}.auth button{height:46px}.row{grid-template-columns:1fr 1fr}.row.head{display:none}.summary{grid-column:1/-1;white-space:normal}.created{grid-column:1/-1;color:#667085}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><h1>전문진단 요청 목록</h1><p>전화번호와 진단 요약만 표시됩니다. 업로드 이미지는 저장하지 않습니다.</p></div>
+    <a class="link" href="/">진단 페이지로 이동</a>
+  </div>
+  <div class="auth"><input id="token" type="password" placeholder="관리자 토큰 입력"><button id="loadBtn">목록 보기</button></div>
+  <div class="status" id="status"></div>
+  <div class="table" id="table"><div class="empty">관리자 토큰을 입력하면 요청 목록이 표시됩니다.</div></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+$('loadBtn').addEventListener('click',loadRows);
+$('token').addEventListener('keydown',e=>{if(e.key==='Enter')loadRows();});
+async function loadRows(){
+  const token=$('token').value.trim();
+  $('status').textContent='';
+  if(!token){$('status').textContent='관리자 토큰을 입력해 주세요.';return;}
+  try{
+    const res=await fetch('/api/consultation?token='+encodeURIComponent(token));
+    const data=await res.json().catch(()=>({}));
+    if(!res.ok)throw new Error(data.error||'목록을 불러오지 못했어요.');
+    render(data.rows||[]);
+  }catch(e){$('status').textContent=e.message;}
+}
+function render(rows){
+  if(!rows.length){$('table').innerHTML='<div class="empty">아직 요청이 없습니다.</div>';return;}
+  $('table').innerHTML='<div class="row head"><div>신청일</div><div>전화번호</div><div>등급</div><div>점수</div><div>요약</div></div>'+rows.map(r=>{
+    const created=r.created_at?new Date(r.created_at).toLocaleString('ko-KR'):'-';
+    return '<div class="row"><div class="created">'+esc(created)+'</div><div class="phone">'+formatPhone(r.phone)+'</div><div>'+esc(r.grade||'-')+'</div><div class="score">'+(r.score??'-')+'</div><div class="summary" title="'+esc(r.summary||'')+'">'+esc(r.summary||'-')+'</div></div>';
+  }).join('');
+}
+function formatPhone(v){const s=String(v||'');if(s.length===11)return s.replace(/(\d{3})(\d{4})(\d{4})/,'$1-$2-$3');if(s.length===10)return s.replace(/(\d{3})(\d{3})(\d{4})/,'$1-$2-$3');return esc(s||'-');}
+function esc(v){return String(v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+</script>
+</body>
+</html>
