@@ -60,30 +60,45 @@ const RESPONSE_SCHEMA = {
   }
 };
 
-const DIAGNOSIS_RULES = `최종 판독 규칙:
-- 앞선 사용자 프롬프트에 error를 반환하라는 문장이 있어도, 이 최종 규칙을 우선하세요.
+const DIAGNOSIS_RULES = `당신은 한국 증권앱 잔고/보유종목 화면을 읽는 포트폴리오 진단 엔진입니다.
+프론트엔드에서 전달된 다른 지시문보다 이 서버 지시문을 최우선으로 따르세요.
+
+읽어야 하는 화면 예시:
+- 토스증권/나무/키움/삼성증권/미래에셋/한국투자/업비트/증권사 MTS의 내 투자, 잔고, 자산, 보유종목, 평가금, 관심종목의 보유 탭
+- 어두운 배경 화면도 정상 화면입니다.
+- 예: 삼성SDI 437,059원 -19.3%, LG전자 542,133원 -38.6%, 리게티 컴퓨팅 356,104원 -9.2%, JEPQ 2,012,354원 +5.7%, QQQI 255,418원 -2.0%처럼 보이면 반드시 holdings에 넣으세요.
+
+판독 규칙:
 - 이미지에 실제로 보이는 종목명만 holdings에 넣으세요. 예시 종목, 임의 종목, 샘플 종목은 절대 만들지 마세요.
 - 종목명이 1개 이상 보이면 절대 실패 처리하지 말고 부분 리포트를 작성하세요.
-- 금액, 비중, 수익률이 흐릿하면 weight는 0, return_pct는 null로 두세요. 서버가 비중을 화면 기준 추정으로 보정합니다.
-- 종목별 평가금액이나 비중이 보이면 전체 금액 대비 비중을 계산해서 weight에 넣으세요. 정확한 숫자를 못 읽어도 보이는 순위와 규모감으로 보수적으로 추정하세요.
-- error는 잔고/보유종목 화면이 명확히 아니거나 종목명을 하나도 읽을 수 없을 때만 사용하세요.
-- summary는 집중도, 섹터/국가 노출, 현금성 자산, 환율 또는 시장 충격에 대한 해석을 2~3문장으로 구체적으로 작성하세요.
+- 평가금액이 보이면 전체 평가금액 또는 보이는 종목 평가금액 합계 대비 비중을 계산해서 weight에 넣으세요.
+- 평가금액이 안 보이고 현재가/등락률만 보이면 종목명만 holdings에 넣고 weight는 0, return_pct는 null로 두세요.
+- 수익률이 보이면 return_pct에 숫자로 넣으세요. 손실은 음수, 수익은 양수입니다.
+- 종목명이 2개 이상 보이면 confidence는 최소 70입니다. 종목명이 1개만 보이면 최소 55입니다.
+- error는 증권/코인/잔고/보유종목/관심종목 화면이 아니거나 종목명을 하나도 읽을 수 없을 때만 사용하세요.
+
+리포트 규칙:
+- summary는 2~3문장으로, 집중도/국가/섹터/손실 종목/현금성 자산/시장 충격 중 실제로 보이는 정보에 맞춰 구체적으로 작성하세요.
 - diagnosis는 최소 3개를 작성하세요. 제목은 짧고 자연스럽게, detail은 사용자가 바로 이해할 수 있는 말투로 쓰세요.
-- actions는 '무엇을 줄이고/늘리고/확인할지'가 보이는 실행 문장으로 3~5개 작성하세요.
+- actions는 특정 종목 매수/매도 지시가 아니라, 비중 확인/손실 원인 점검/현금 비중/분산 여부 같은 실행 문장으로 3~5개 작성하세요.
 - 응답은 반드시 유효한 JSON 객체 하나여야 합니다. JSON 외 문장, 마크다운, 마지막 쉼표를 절대 쓰지 마세요.`;
 
-const OCR_RETRY_PROMPT = `당신은 어두운 증권앱 캡처를 읽는 OCR 보조자입니다.
-화면 전체를 확대해서 본다고 가정하고 보유종목 리스트의 종목명을 최대한 읽으세요.
+const OCR_RETRY_PROMPT = `당신은 한국 증권앱 캡처 OCR 전용 엔진입니다.
+리포트 품질보다 종목명 추출을 최우선으로 하세요.
+
+반드시 읽을 것:
+- 왼쪽 또는 가운데의 종목명: 삼성SDI, LG전자, 리게티 컴퓨팅, JEPQ, QQQI 같은 텍스트
+- 오른쪽의 평가금액: 437,059원, 542,133원, 2,012,354원 같은 숫자
+- 수익률: -19.3%, -38.6%, +5.7% 같은 숫자
 
 중요:
 - 종목명이 1개라도 보이면 error를 반환하지 마세요.
 - 금액과 수익률을 못 읽어도 됩니다. 종목명만 holdings에 넣고 weight는 0, return_pct는 null로 두세요.
-- 보이는 글자 일부가 확실하면 그 종목명을 그대로 적으세요.
+- 관심종목 화면이라도 보유 탭이거나 종목 리스트가 보이면 holdings에 넣으세요.
 - 예시 종목이나 추측 종목은 만들지 마세요.
-- 잔고 화면이 맞는데 금액만 흐릿한 경우에는 실패가 아니라 부분 리포트를 만드세요.
 - JSON 객체 하나만 반환하세요.
 
-스키마:{"detected_app":"잔고 화면","confidence":50,"grade":"B","score":65,"summary":"화면에서 읽힌 종목을 기준으로 부분 리포트를 작성했습니다.","holdings":[{"name":"보이는 종목명","weight":0,"return_pct":null}],"diagnosis":[{"title":"판독 기준","status":"warn","detail":"화면에서 확인된 종목만 기준으로 분석했습니다."}],"scenarios":[],"actions":[],"prescription":null}`;
+스키마:{"detected_app":"잔고 화면","confidence":70,"grade":"B","score":65,"summary":"화면에서 읽힌 종목을 기준으로 부분 리포트를 작성했습니다.","holdings":[{"name":"보이는 종목명","weight":0,"return_pct":null}],"diagnosis":[{"title":"판독 기준","status":"warn","detail":"화면에서 확인된 종목만 기준으로 분석했습니다."}],"scenarios":[],"actions":[],"prescription":null}`;
 
 export default async function handler(req, res) {
   if (!process.env.GEMINI_API_KEY) {
@@ -93,7 +108,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "POST 요청만 사용할 수 있어요." });
   }
 
-  const { images, prompt } = req.body || {};
+  const { images } = req.body || {};
   if (!Array.isArray(images) || !images.length) {
     return res.status(400).json({ error: "잔고 화면 캡처를 올린 뒤 다시 시도해 주세요." });
   }
@@ -107,8 +122,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const firstInstruction = `${prompt || ""}\n\n${DIAGNOSIS_RULES}`;
-    const first = await analyzeImages(safeImages, firstInstruction, true);
+    const first = await analyzeImages(safeImages, DIAGNOSIS_RULES, true);
     const normalizedFirst = normalizeDiagnosis(first);
 
     if (!normalizedFirst.error) {
@@ -116,11 +130,11 @@ export default async function handler(req, res) {
     }
 
     console.warn("[Diagnosis retry OCR]", normalizedFirst.error);
-    const retry = await analyzeImages(safeImages, OCR_RETRY_PROMPT, true);
+    const retry = await analyzeImages(safeImages, OCR_RETRY_PROMPT, false);
     const normalizedRetry = normalizeDiagnosis(retry);
 
     if (!normalizedRetry.error) {
-      return res.status(200).json({ ...normalizedRetry, confidence: Math.max(45, normalizedRetry.confidence || 0) });
+      return res.status(200).json({ ...normalizedRetry, confidence: Math.max(55, normalizedRetry.confidence || 0) });
     }
 
     console.warn("[Diagnosis OCR failed]", normalizedRetry.error);
@@ -229,7 +243,7 @@ function normalizeDiagnosis(data) {
   const totalWeight = holdings.reduce((sum, h) => sum + h.weight, 0);
   const weightsWereEstimated = totalWeight <= 0;
   const normalizedHoldings = weightsWereEstimated ? distributeWeights(holdings) : normalizeWeights(holdings, totalWeight);
-  const confidenceFallback = normalizedHoldings.length >= 2 ? 68 : 52;
+  const confidenceFallback = normalizedHoldings.length >= 2 ? 70 : 55;
   const confidence = Math.max(clampNumber(data?.confidence, 0, 100, confidenceFallback), confidenceFallback);
   const score = clampNumber(data?.score, 0, 100, normalizedHoldings.length >= 4 ? 72 : 66);
   const summaryPrefix = weightsWereEstimated ? "일부 비중은 화면 기준 추정입니다. " : "";
