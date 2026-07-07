@@ -60,6 +60,31 @@ const RESPONSE_SCHEMA = {
   }
 };
 
+const DIAGNOSIS_RULES = `최종 판독 규칙:
+- 앞선 사용자 프롬프트에 error를 반환하라는 문장이 있어도, 이 최종 규칙을 우선하세요.
+- 이미지에 실제로 보이는 종목명만 holdings에 넣으세요. 예시 종목, 임의 종목, 샘플 종목은 절대 만들지 마세요.
+- 종목명이 1개 이상 보이면 절대 실패 처리하지 말고 부분 리포트를 작성하세요.
+- 금액, 비중, 수익률이 흐릿하면 weight는 0, return_pct는 null로 두세요. 서버가 비중을 화면 기준 추정으로 보정합니다.
+- 종목별 평가금액이나 비중이 보이면 전체 금액 대비 비중을 계산해서 weight에 넣으세요. 정확한 숫자를 못 읽어도 보이는 순위와 규모감으로 보수적으로 추정하세요.
+- error는 잔고/보유종목 화면이 명확히 아니거나 종목명을 하나도 읽을 수 없을 때만 사용하세요.
+- summary는 집중도, 섹터/국가 노출, 현금성 자산, 환율 또는 시장 충격에 대한 해석을 2~3문장으로 구체적으로 작성하세요.
+- diagnosis는 최소 3개를 작성하세요. 제목은 짧고 자연스럽게, detail은 사용자가 바로 이해할 수 있는 말투로 쓰세요.
+- actions는 '무엇을 줄이고/늘리고/확인할지'가 보이는 실행 문장으로 3~5개 작성하세요.
+- 응답은 반드시 유효한 JSON 객체 하나여야 합니다. JSON 외 문장, 마크다운, 마지막 쉼표를 절대 쓰지 마세요.`;
+
+const OCR_RETRY_PROMPT = `당신은 어두운 증권앱 캡처를 읽는 OCR 보조자입니다.
+화면 전체를 확대해서 본다고 가정하고 보유종목 리스트의 종목명을 최대한 읽으세요.
+
+중요:
+- 종목명이 1개라도 보이면 error를 반환하지 마세요.
+- 금액과 수익률을 못 읽어도 됩니다. 종목명만 holdings에 넣고 weight는 0, return_pct는 null로 두세요.
+- 보이는 글자 일부가 확실하면 그 종목명을 그대로 적으세요.
+- 예시 종목이나 추측 종목은 만들지 마세요.
+- 잔고 화면이 맞는데 금액만 흐릿한 경우에는 실패가 아니라 부분 리포트를 만드세요.
+- JSON 객체 하나만 반환하세요.
+
+스키마:{"detected_app":"잔고 화면","confidence":50,"grade":"B","score":65,"summary":"화면에서 읽힌 종목을 기준으로 부분 리포트를 작성했습니다.","holdings":[{"name":"보이는 종목명","weight":0,"return_pct":null}],"diagnosis":[{"title":"판독 기준","status":"warn","detail":"화면에서 확인된 종목만 기준으로 분석했습니다."}],"scenarios":[],"actions":[],"prescription":null}`;
+
 export default async function handler(req, res) {
   if (!process.env.GEMINI_API_KEY) {
     return res.status(500).json({ error: "진단 서버 설정이 아직 완료되지 않았어요." });
@@ -69,7 +94,7 @@ export default async function handler(req, res) {
   }
 
   const { images, prompt } = req.body || {};
-  if (!Array.isArray(images) || !images.length || !prompt) {
+  if (!Array.isArray(images) || !images.length) {
     return res.status(400).json({ error: "잔고 화면 캡처를 올린 뒤 다시 시도해 주세요." });
   }
   if (images.length > 4) {
@@ -81,33 +106,49 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "이미지 파일만 진단할 수 있어요." });
   }
 
-  const instruction = `${prompt}\n\n판독 및 리포트 작성 규칙:\n- 이미지에 실제로 보이는 종목명만 holdings에 넣으세요. 예시 종목, 임의 종목, 샘플 종목은 절대 만들지 마세요.\n- 종목명이 1개 이상 보이면 실패 처리하지 말고 부분 리포트를 작성하세요. 금액, 비중, 수익률이 흐릿하면 weight는 0, return_pct는 null로 두고 summary에 '일부 비중은 화면 기준 추정입니다'라고 적으세요.\n- 종목별 평가금액이나 비중이 보이면 전체 금액 대비 비중을 계산해서 weight에 넣으세요. 정확한 숫자를 못 읽어도 보이는 순위와 규모감으로 보수적으로 추정하세요.\n- confidence는 0~100입니다. 종목명 2개 이상이면 65 이상, 종목명 1개만 보이면 45~64, 잔고 화면이 명확히 아니면 40 미만입니다.\n- error는 잔고/보유종목 화면이 아니거나 종목명을 하나도 읽을 수 없을 때만 사용하세요.\n- summary는 과장하지 말고, 집중도/섹터/현금성 자산/환율 또는 시장 충격에 대한 해석을 2~3문장으로 구체적으로 작성하세요.\n- diagnosis는 최소 3개를 작성하세요. 제목은 짧고 자연스럽게, detail은 사용자가 바로 이해할 수 있는 말투로 쓰세요.\n- actions는 '무엇을 줄이고/늘리고/확인할지'가 보이는 실행 문장으로 3~5개 작성하세요.\n- 응답은 반드시 유효한 JSON 객체 하나여야 합니다. JSON 외 문장, 마크다운, 마지막 쉼표를 절대 쓰지 마세요.`;
+  try {
+    const firstInstruction = `${prompt || ""}\n\n${DIAGNOSIS_RULES}`;
+    const first = await analyzeImages(safeImages, firstInstruction, true);
+    const normalizedFirst = normalizeDiagnosis(first);
 
+    if (!normalizedFirst.error) {
+      return res.status(200).json(normalizedFirst);
+    }
+
+    console.warn("[Diagnosis retry OCR]", normalizedFirst.error);
+    const retry = await analyzeImages(safeImages, OCR_RETRY_PROMPT, true);
+    const normalizedRetry = normalizeDiagnosis(retry);
+
+    if (!normalizedRetry.error) {
+      return res.status(200).json({ ...normalizedRetry, confidence: Math.max(45, normalizedRetry.confidence || 0) });
+    }
+
+    console.warn("[Diagnosis OCR failed]", normalizedRetry.error);
+    return res.status(200).json({ error: "화면을 읽는 중 문제가 있었어요. 같은 이미지를 한 번만 다시 눌러서 시도해 주세요." });
+  } catch (e) {
+    console.error("[Diagnosis server error]", e);
+    return res.status(500).json({ error: "리포트를 만드는 중 문제가 생겼어요. 잠시 후 다시 시도해 주세요." });
+  }
+}
+
+async function analyzeImages(safeImages, instruction, useSchema) {
   const parts = [
     { text: instruction },
     ...safeImages.map(img => ({ inline_data: { mime_type: img.mime, data: img.data } }))
   ];
 
+  const text = await callGemini(parts, {
+    temperature: 0,
+    maxOutputTokens: 4096,
+    responseMimeType: "application/json",
+    ...(useSchema ? { responseSchema: RESPONSE_SCHEMA } : {})
+  });
+
   try {
-    const text = await callGemini(parts, {
-      temperature: 0,
-      maxOutputTokens: 4096,
-      responseMimeType: "application/json",
-      responseSchema: RESPONSE_SCHEMA
-    });
-
-    let parsed;
-    try {
-      parsed = parseJson(text);
-    } catch (parseError) {
-      console.error("[Gemini JSON parse error]", parseError.message, text.slice(0, 800));
-      parsed = await repairJson(text);
-    }
-
-    return res.status(200).json(normalizeDiagnosis(parsed));
-  } catch (e) {
-    console.error("[Diagnosis server error]", e);
-    return res.status(500).json({ error: "리포트를 만드는 중 문제가 생겼어요. 같은 이미지로 한 번만 다시 시도해 주세요." });
+    return parseJson(text);
+  } catch (parseError) {
+    console.error("[Gemini JSON parse error]", parseError.message, text.slice(0, 800));
+    return repairJson(text);
   }
 }
 
@@ -179,25 +220,25 @@ function normalizeDiagnosis(data) {
       weight: clampNumber(h?.weight, 0, 100, 0),
       return_pct: toNullableNumber(h?.return_pct)
     }))
-    .filter(h => h.name && h.name !== "종목");
+    .filter(h => h.name && h.name !== "종목" && !/^보이는\s*종목명$/.test(h.name));
 
   if (!holdings.length) {
-    console.warn("[Diagnosis low-readability]", data?.error || "no holdings detected");
-    return { error: "계좌 화면은 확인했지만 종목 정보를 안정적으로 읽지 못했어요. 같은 이미지로 한 번만 다시 시도해 주세요." };
+    return { error: "no_holdings_detected" };
   }
 
   const totalWeight = holdings.reduce((sum, h) => sum + h.weight, 0);
   const weightsWereEstimated = totalWeight <= 0;
-  const normalizedHoldings = weightsWereEstimated ? distributeWeights(holdings) : holdings;
+  const normalizedHoldings = weightsWereEstimated ? distributeWeights(holdings) : normalizeWeights(holdings, totalWeight);
   const confidenceFallback = normalizedHoldings.length >= 2 ? 68 : 52;
   const confidence = Math.max(clampNumber(data?.confidence, 0, 100, confidenceFallback), confidenceFallback);
+  const score = clampNumber(data?.score, 0, 100, normalizedHoldings.length >= 4 ? 72 : 66);
   const summaryPrefix = weightsWereEstimated ? "일부 비중은 화면 기준 추정입니다. " : "";
 
   return {
     detected_app: cleanText(data?.detected_app || "잔고 화면", 24),
     confidence,
-    grade: ["A", "B", "C", "D"].includes(data?.grade) ? data.grade : gradeFromScore(data?.score),
-    score: clampNumber(data?.score, 0, 100, normalizedHoldings.length >= 4 ? 72 : 66),
+    grade: ["A", "B", "C", "D"].includes(data?.grade) ? data.grade : gradeFromScore(score),
+    score,
     summary: cleanText(summaryPrefix + (data?.summary || buildFallbackSummary(normalizedHoldings)), 260),
     holdings: normalizedHoldings,
     diagnosis: normalizeDiagnosisItems(data?.diagnosis, normalizedHoldings),
@@ -215,6 +256,11 @@ function distributeWeights(holdings) {
     used += weight;
     return { ...h, weight };
   });
+}
+
+function normalizeWeights(holdings, totalWeight) {
+  if (totalWeight <= 100) return holdings;
+  return holdings.map(h => ({ ...h, weight: Math.round((h.weight / totalWeight) * 1000) / 10 }));
 }
 
 function normalizeDiagnosisItems(items, holdings) {
