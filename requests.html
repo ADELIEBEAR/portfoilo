@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>전문진단 요청 관리</title>
+<title>무료 점검 요청 관리 - 포트폴리오 리포트</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
 <style>
@@ -14,8 +14,8 @@
 <body>
 <div class="wrap">
   <div class="top">
-    <div><h1>전문진단 요청 관리</h1><p>전화번호와 진단 요약만 표시됩니다. 업로드 이미지는 저장하지 않습니다.</p></div>
-    <a class="link" href="/">진단 페이지로 이동</a>
+    <div><h1>무료 점검 요청 관리</h1><p>전화번호와 리포트 요약만 표시됩니다. 업로드 이미지는 저장하지 않습니다.</p></div>
+    <a class="link" href="/">리포트 페이지로 이동</a>
   </div>
 
   <div class="auth" id="authBox">
@@ -36,7 +36,7 @@
     <button id="refreshBtn">새로고침</button>
   </div>
 
-  <div class="list" id="list"><div class="empty">관리자 토큰을 입력하면 전문진단 요청 목록이 표시됩니다.</div></div>
+  <div class="list" id="list"><div class="empty">관리자 토큰을 입력하면 무료 점검 요청 목록이 표시됩니다.</div></div>
 
   <div class="guide">
     <b>운영 팁</b><br>
@@ -97,7 +97,7 @@ function card(r,i){
       <div class="date">신청일<br>${esc(createdText)}<br>${created?esc(relativeTime(created)):''}</div>
       <div><div class="phone">${phone}</div><span class="grade">${esc(r.grade||'-')} 등급</span></div>
       <div class="score">점수<strong>${r.score??'-'}</strong></div>
-      <div class="summary"><h3>진단 요약</h3><p>${esc(r.summary||'요약 없음')}</p><div class="meta"><span class="pill">${esc(r.detected_app||'앱 미확인')}</span><span class="pill">보유 ${r.holdings_count??0}개</span><span class="pill">${esc(r.source||'portfolio')}</span></div></div>
+      <div class="summary"><h3>리포트 요약</h3><p>${esc(r.summary||'요약 없음')}</p><div class="meta"><span class="pill">${esc(r.detected_app||'앱 미확인')}</span><span class="pill">보유 ${r.holdings_count??0}개</span><span class="pill">${esc(r.source||'portfolio')}</span></div></div>
     </div>
     <div class="actions"><button class="action primary" data-copy="${esc(String(r.phone||''))}">전화번호 복사</button><a class="action" href="tel:${esc(String(r.phone||''))}">전화 걸기</a><span class="copied" id="copied-${i}"></span></div>
   </article>`;
