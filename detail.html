@@ -25,6 +25,13 @@ main{width:min(1100px,calc(100% - 40px));padding:48px 0 96px}.hero{grid-template
 @keyframes detailEnter{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}.advisor-hero{animation:detailEnter .55s ease both}.form-panel{animation:detailEnter .55s .08s ease both}
 @media(max-width:860px){main{width:min(100% - 24px,1100px);padding-top:20px}.hero{grid-template-columns:1fr}.hero-copy.advisor-hero{min-height:auto;padding:32px 26px}.advisor-hero h1{font-size:43px}.form-panel{margin-top:0}.proof-grid,.summary-grid{grid-template-columns:1fr}}
 @media(max-width:520px){.topbar{height:56px}.hero-copy.advisor-hero{padding:28px 20px;border-radius:8px}.advisor-hero h1{font-size:35px;line-height:1.08}.advisor-hero .lead{font-size:15px}.form-panel,.section{border-radius:8px}.form-head{padding:18px}.form-head h2{font-size:24px}.section{padding:20px 16px}.sticky-cta{padding-left:12px;padding-right:12px}}
+/* taste direction v2: monochrome editorial with cobalt accent */
+:root{--bg:#f4f5f2;--card:#fff;--ink:#0b0d0c;--text:#3e4541;--muted:#7d847f;--line:#dfe2df;--blue:#3157f6;--blue2:#edf0ff;--green:#16a56f;--orange:#f09a27;--red:#e34b58;--navy:#0b0d0c;--shadow:0 24px 70px rgba(11,13,12,.10)}
+body{background:#f4f5f2;color:#0b0d0c}.topbar{background:rgba(244,245,242,.92);border-color:#d9dcd9}.logo{background:#0b0d0c}.back{border-color:#cfd3cf;color:#0b0d0c}
+.hero{grid-template-columns:minmax(0,1.2fr) 390px;gap:20px}.hero-copy.advisor-hero{border-color:#cfd3cf;background:#fff;box-shadow:14px 16px 0 #0b0d0c}.advisor-hero .badge{border-color:#cfd5ff;background:#f1f3ff;color:#3157f6}.advisor-hero .badge:before{background:#3157f6;box-shadow:0 0 0 5px rgba(49,87,246,.10)}.advisor-hero h1{font-size:58px}.advisor-hero h1 em{color:#3157f6}.advisor-hero .trust-row span:before{background:#3157f6}
+.form-panel{border-color:#cfd3cf;box-shadow:none}.form-head{border-color:#d9ddff;background:#f4f5ff}.form-head small{color:#3157f6}input[type="tel"]:focus{border-color:#3157f6;box-shadow:0 0 0 4px rgba(49,87,246,.10)}.consent input{accent-color:#3157f6}.btn{background:#3157f6}.btn:hover{background:#2344d7}.summary-card{background:#f4f5ff}.sticky-cta a{background:#3157f6}
+@media(max-width:860px){.advisor-hero h1{font-size:45px}.hero-copy.advisor-hero{box-shadow:8px 10px 0 #0b0d0c}}
+@media(max-width:520px){.advisor-hero h1{font-size:37px}.hero-copy.advisor-hero{box-shadow:none}}
 </style>
 </head>
 <body>
