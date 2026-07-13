@@ -13,6 +13,18 @@
 /* advisor landing banner */
 .advisor-hero{padding:38px 34px;background:linear-gradient(135deg,#fff 0%,#f8fbff 58%,#eef4ff 100%);color:#111827;border:1px solid #e4eaf3;box-shadow:0 18px 46px rgba(16,24,40,.08);isolation:isolate}.advisor-hero:before,.advisor-hero:after{display:none}.advisor-hero .hero-text{position:relative;z-index:2}.advisor-hero .badge{background:#eef4ff;border-color:#d8e6ff;color:#1f5eff}.advisor-hero h1{color:#111827}.advisor-hero h1 em{color:#2563eb}.advisor-hero .lead{color:#475467;max-width:650px}.advisor-hero .trust-row{display:grid;grid-template-columns:1fr;gap:9px;max-width:560px;margin-top:18px}.advisor-hero .trust-row span{height:auto;min-height:42px;padding:12px 14px;background:rgba(255,255,255,.86);border-color:#e3e8ef;color:#344054;border-radius:14px;justify-content:flex-start}@media(max-width:860px){.advisor-hero{padding:30px 22px}}@media(max-width:520px){.advisor-hero{padding:28px 20px}.advisor-hero .trust-row{gap:8px}}
 .form-panel{border-radius:24px}.form-head{background:linear-gradient(180deg,#f8fbff,#fff);border-color:#dbe7ff}.form-head small{color:#1f5eff}.form-head h2{font-size:27px}.form-head p{font-size:14px}.sticky-cta a{background:linear-gradient(135deg,#2563eb,#1d4ed8)}
+/* 2026 editorial finance redesign */
+:root{--bg:#f2f6f3;--card:#fff;--ink:#101714;--text:#34443d;--muted:#718078;--line:#dce5df;--blue:#176b52;--blue2:#edf7f2;--green:#13a678;--orange:#d49121;--red:#dc4554;--navy:#101714;--shadow:0 18px 52px rgba(23,54,43,.09)}
+body{background:linear-gradient(180deg,#f9fbfa 0,#f1f5f2 100%);color:var(--ink)}
+.topbar{height:66px;background:rgba(249,251,250,.92);border-color:rgba(16,23,20,.09)}.logo{border-radius:8px;background:#111915}.back{height:38px;border-radius:8px;border-color:#d4ded8;background:transparent;color:#405048}
+main{width:min(1100px,calc(100% - 40px));padding:48px 0 96px}.hero{grid-template-columns:minmax(0,1fr) 400px;gap:18px}
+.hero-copy.advisor-hero{min-height:500px;padding:44px;border-radius:8px;border-color:#d8e2dc;background:#fff;color:#101714;box-shadow:0 22px 68px rgba(23,54,43,.09)}
+.advisor-hero .badge{height:30px;border-color:#cce0d5;background:#edf7f2;color:#176b52}.advisor-hero h1{max-width:650px;margin-top:24px;font-size:54px;line-height:1.04;color:#101714}.advisor-hero h1 em{color:#176b52}.advisor-hero .lead{max-width:610px;margin-top:22px;color:#52625a;font-size:17px}.advisor-hero .trust-row{max-width:590px;gap:0;margin-top:28px;border-top:1px solid #d6e0da}.advisor-hero .trust-row span{min-height:48px;padding:13px 2px;border:0;border-bottom:1px solid #e1e8e4;border-radius:0;background:transparent;color:#2e3c35}.advisor-hero .trust-row span:before{content:"";width:6px;height:6px;margin-right:10px;border-radius:50%;background:#13a678}
+.form-panel{padding:16px;border-radius:8px;border-color:#d8e2dc;background:#fff;box-shadow:0 22px 68px rgba(23,54,43,.09)}.form-head{padding:21px;border-radius:6px;border-color:#dce6e0;background:#f3f8f5}.form-head small{color:#176b52}.form-head h2{font-size:28px}.form-head p{color:#66766e}.field{margin-top:18px}label{color:#26342d}input[type="tel"]{height:58px;border-radius:6px;border-color:#cdd9d2;background:#fbfcfb}input[type="tel"]:focus{border-color:#176b52;box-shadow:0 0 0 4px rgba(23,107,82,.1)}.consent{border-radius:6px;border-color:#dce5df;background:#f8faf9}.consent input{accent-color:#176b52}.btn{height:58px;border-radius:6px;background:#111915;box-shadow:none;transition:transform .18s ease,background .18s ease}.btn:hover{transform:translateY(-1px);background:#1c2b23}.micro{color:#78857e}
+.section{margin-top:18px;padding:26px;border-radius:8px;border-color:#dce5df;background:#fff;box-shadow:none}.section-title{font-size:21px}.proof-grid{gap:1px;border:1px solid #dce5df;border-radius:6px;overflow:hidden;background:#dce5df}.proof{padding:18px;border:0;border-radius:0;background:#fff}.proof p{color:#66766e}.summary-grid{grid-template-columns:150px 110px 1fr;gap:8px}.summary-card,.diagnosis-text{border-radius:6px;border-color:#dce5df}.summary-card{background:#f4f8f6}.sticky-cta{border-color:#d6e0da;background:rgba(249,251,250,.94)}.sticky-cta a{border-radius:6px;background:#111915;box-shadow:none}
+@keyframes detailEnter{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}.advisor-hero{animation:detailEnter .55s ease both}.form-panel{animation:detailEnter .55s .08s ease both}
+@media(max-width:860px){main{width:min(100% - 24px,1100px);padding-top:20px}.hero{grid-template-columns:1fr}.hero-copy.advisor-hero{min-height:auto;padding:32px 26px}.advisor-hero h1{font-size:43px}.form-panel{margin-top:0}.proof-grid,.summary-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.topbar{height:56px}.hero-copy.advisor-hero{padding:28px 20px;border-radius:8px}.advisor-hero h1{font-size:35px;line-height:1.08}.advisor-hero .lead{font-size:15px}.form-panel,.section{border-radius:8px}.form-head{padding:18px}.form-head h2{font-size:24px}.section{padding:20px 16px}.sticky-cta{padding-left:12px;padding-right:12px}}
 </style>
 </head>
 <body>
@@ -48,10 +60,10 @@
             <label for="phone">연락받을 전화번호</label>
             <input id="phone" name="phone" type="tel" inputmode="tel" placeholder="010-0000-0000" autocomplete="tel" required />
           </div>
-          <label class="consent"><input id="consent" type="checkbox" required><span>무료 점검 신청을 위해 전화번호와 AI 리포트 요약을 저장하는 데 동의합니다.</span></label>
+          <label class="consent"><input id="consent" type="checkbox" required><span>무료 점검 신청에 동의합니다.</span></label>
           <button class="btn" id="submitBtn" type="submit">무료로 점검 신청하기</button>
         </form>
-        <p class="micro">이미지는 저장하지 않습니다. 전화번호와 AI 리포트 요약만 신청 확인용으로 저장됩니다.</p>
+        <p class="micro">확인 후 필요한 경우에만 연락드립니다.</p>
         <div class="toast" id="toast"></div>
       </section>
     </section>
@@ -79,7 +91,7 @@
       <div class="proof-grid">
         <div class="proof"><b>포트폴리오 검토 경험</b><p>국내주식, 해외주식, ETF 비중을 함께 보는 담당자가 AI 요약을 기준으로 확인합니다.</p></div>
         <div class="proof"><b>상담보다 점검에 가깝게</b><p>부담스러운 영업 상담이 아니라, 현재 계좌에서 막히는 부분을 같이 정리하는 방식입니다.</p></div>
-        <div class="proof"><b>개인정보 최소화</b><p>이미지는 저장하지 않고, 전화번호와 AI 리포트 요약만 신청 확인용으로 저장합니다.</p></div>
+        <div class="proof"><b>간단한 신청</b><p>전화번호만 남기면 현재 계좌에서 막히는 부분을 같이 정리합니다.</p></div>
       </div>
     </section>
 
@@ -97,8 +109,22 @@
 
   <script>
     const rawDiagnosis = sessionStorage.getItem('lastDiagnosis');
+    const rawImages = sessionStorage.getItem('lastPortfolioImages');
     let diagnosis = null;
+    let uploadedImages = [];
     try { diagnosis = rawDiagnosis ? JSON.parse(rawDiagnosis) : null; } catch (error) { diagnosis = null; }
+    try { uploadedImages = rawImages ? JSON.parse(rawImages) : []; } catch (error) { uploadedImages = []; }
+    const params = new URLSearchParams(location.search);
+    const sourceInfo = {
+      source: params.get('source') || params.get('utm_source') || 'portfolio_diagnosis',
+      db_name: params.get('db') || params.get('db_name') || '포트폴리오 무료점검 DB',
+      form_name: params.get('form') || params.get('form_name') || '무료 포트폴리오 점검 신청',
+      landing_url: location.href,
+      referrer: document.referrer || '',
+      utm_source: params.get('utm_source') || '',
+      utm_medium: params.get('utm_medium') || '',
+      utm_campaign: params.get('utm_campaign') || ''
+    };
     const scoreText = document.getElementById('scoreText');
     const gradeText = document.getElementById('gradeText');
     const summaryText = document.getElementById('summaryText');
@@ -120,16 +146,16 @@
       event.preventDefault();
       const phone = phoneInput.value.trim();
       if (!phone) { showToast('연락받을 전화번호를 입력해 주세요.', 'err'); phoneInput.focus(); return; }
-      if (!consentInput.checked) { showToast('신청을 위해 저장 동의가 필요합니다.', 'err'); consentInput.focus(); return; }
+      if (!consentInput.checked) { showToast('신청 동의가 필요합니다.', 'err'); consentInput.focus(); return; }
       submitBtn.disabled = true; submitBtn.textContent = '신청 중...';
       try {
-        const response = await fetch('/api/consultation', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ phone, consent:true, diagnosis: diagnosis || { summary:'무료 포트폴리오 점검 신청' } }) });
+        const response = await fetch('/api/consultation', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ phone, consent:true, diagnosis: diagnosis || { summary:'무료 포트폴리오 점검 신청' }, sourceInfo, uploadedImages }) });
         const result = await response.json().catch(() => ({}));
         if (!response.ok || !result.ok) throw new Error(result.error || 'request failed');
         showToast('신청이 접수됐어요. 확인 후 필요한 경우에만 연락드립니다.', 'ok');
         form.reset();
       } catch (error) {
-        showToast('신청을 저장하지 못했어요. 잠시 후 다시 시도해 주세요.', 'err');
+        showToast('신청을 완료하지 못했어요. 잠시 후 다시 시도해 주세요.', 'err');
       } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = '무료로 점검 신청하기';
