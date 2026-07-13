@@ -33,6 +33,10 @@ body{background:#f4f5f2;color:#0b0d0c}.topbar{background:rgba(244,245,242,.92);b
 @media(max-width:860px){.advisor-hero h1{font-size:45px}.hero-copy.advisor-hero{box-shadow:8px 10px 0 #0b0d0c}}
 @media(max-width:520px){.advisor-hero h1{font-size:37px}.hero-copy.advisor-hero{box-shadow:none}}
 h1,.lead,.form-head h2,.form-head p,.proof p{word-break:keep-all;overflow-wrap:normal}
+/* structural rebuild: focused follow-up page */
+main{width:min(1080px,calc(100% - 40px));padding-top:40px}.hero{grid-template-columns:minmax(0,1fr) 400px;gap:16px}.hero-copy.advisor-hero{min-height:520px;padding:44px;background:#0b0d0c;color:#fff;border:0;box-shadow:none}.advisor-hero .badge{border:0;background:#20254a;color:#b8c4ff}.advisor-hero h1{max-width:620px;font-size:52px;color:#fff}.advisor-hero h1 em{color:#7690ff}.advisor-hero .lead{max-width:540px;color:#c9cecb}.advisor-hero .trust-row{border-color:#343a36}.advisor-hero .trust-row span{border-color:#2d332f;color:#e8ebe9}.form-panel{border-color:#d7dad7;box-shadow:0 22px 60px rgba(26,31,28,.09)}
+@media(max-width:860px){main{width:min(100% - 24px,1080px)}.hero{grid-template-columns:1fr}.hero-copy.advisor-hero{min-height:auto}.advisor-hero h1{font-size:44px}}
+@media(max-width:520px){main{padding-top:12px}.hero-copy.advisor-hero{padding:28px 20px}.advisor-hero h1{font-size:34px}.advisor-hero .trust-row{margin-top:22px}.advisor-hero .trust-row span{min-height:44px}.form-panel{box-shadow:none}}
 </style>
 </head>
 <body>
@@ -168,6 +172,14 @@ h1,.lead,.form-head h2,.form-head p,.proof p{word-break:keep-all;overflow-wrap:n
         submitBtn.disabled = false;
         submitBtn.textContent = '무료로 점검 신청하기';
       }
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const title=document.querySelector('.advisor-hero h1');
+      const lead=document.querySelector('.advisor-hero .lead');
+      if(title)title.innerHTML='혼자 정리하기 어렵다면,<br><em>함께 순서를 잡아드립니다.</em>';
+      if(lead)lead.textContent='비중 쏠림과 손실 구간을 기준으로 지금 계좌에서 먼저 볼 것부터 차근차근 정리합니다.';
     });
   </script>
 </body>
